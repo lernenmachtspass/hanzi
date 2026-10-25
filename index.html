@@ -1,1 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小马卡龙手绘识字乐园</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+        .font-kids { font-family: 'ZCOOL KuaiLe', cursive, sans-serif; }
+        .hand-drawn-box {
+            background-color: #FFFDF9;
+            border: 3px dashed #E2C799;
+            border-radius: 25px;
+            box-shadow: 0 8px 0px rgba(226, 199, 153, 0.4);
+        }
+        .hand-drawn-btn {
+            border: 3px solid #E2C799;
+            border-radius: 20px;
+            box-shadow: 0 4px 0px rgba(226, 199, 153, 0.6);
+            transition: all 0.1s ease;
+        }
+        .hand-drawn-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0px rgba(226, 199, 153, 0.6);
+        }
+    </style>
+</head>
+<body class="bg-[#FDF6EC] font-kids select-none text-[#5C4033]">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-[#A8D8B9] text-[#2F4F4F] p-4 shadow-md flex justify-between items-center border-b-4 border-[#88C49F]">
+        <h1 class="text-3xl tracking-wider flex items-center gap-2">🎨 汉字小森林</h1>
+        <div class="space-x-3">
+            <button onclick="switchTab('learn')" id="btn-learn" class="bg-[#FFF5EE] text-[#5C4033] px-6 py-2 rounded-2xl text-xl font-bold hand-drawn-btn cursor-pointer">📖 快乐学习</button>
+            <button onclick="switchTab('test')" id="btn-test" class="bg-[#FFB7B2] text-[#5C4033] px-6 py-2 rounded-2xl text-xl font-bold hand-drawn-btn cursor-pointer">🎯 趣味测试</button>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="max-w-4xl mx-auto p-4 mt-4">
+
+        <!-- 学习模块 -->
+        <section id="module-learn" class="space-y-6">
+            <div class="hand-drawn-box p-4">
+                <div class="text-lg text-center mb-2 text-[#8B7D6B]">✨ 选择闯关小岛（每组10个字） ✨</div>
+                <div id="group-buttons" class="flex flex-wrap gap-2 justify-center max-h-36 overflow-y-auto p-2">
+                    <!-- 动态生成分组按钮 -->
+                </div>
+            </div>
+
+            <div class="hand-drawn-box p-6 text-center">
+                <h2 id="current-group-title" class="text-2xl text-[#D98880] mb-4">第一组：认识我们的字</h2>
+                <div id="char-grid" class="grid grid-cols-2 sm:grid-cols-5 gap-4 p-2">
+                    <!-- 动态生成汉字卡片 -->
+                </div>
+            </div>
+
+            <!-- 详情展示卡片 -->
+            <div id="display-card" class="hand-drawn-box p-6 flex flex-col md:flex-row items-center gap-6 hidden bg-[#FFF9E6]">
+                <div class="text-center md:w-1/2">
+                    <span id="card-char" class="text-9xl text-[#E06D53] block mb-4">天</span>
+                    <button onclick="speakCurrent()" class="bg-[#85C1E9] text-white px-8 py-3 rounded-2xl text-2xl font-bold hand-drawn-btn cursor-pointer">🔊 读一读发音</button>
+                </div>
+                <div class="md:w-1/2 w-full text-center">
+                    <div class="text-sm text-[#8B7D6B] mb-2 font-bold" id="video-title-desc">🎬 传统文化小剧场：远古神话/古诗动画</div>
+                    <div class="bg-black rounded-2xl overflow-hidden aspect-video flex items-center justify-center relative border-4 border-[#F5B041]">
+                        <video id="card-video" class="w-full h-full object-cover" autoplay loop muted playsinline>
+                            <source src="https://assets.mixkit.co/videos/preview/mixkit-clouds-and-blue-sky-2408-large.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 测试模块 -->
+        <section id="module-test" class="hidden">
+            <div class="hand-drawn-box p-8 text-center bg-[#F9EBEA]">
+                <h2 class="text-3xl text-[#CD6155] mb-4">🎯 神秘字卡大考验</h2>
+                <div id="test-info" class="text-lg text-[#7F8C8D] mb-4">当前范围：已学习的字（最多10个）</div>
+                
+                <button onclick="playTargetSound()" class="bg-[#F1948A] text-white px-8 py-4 rounded-full text-3xl font-bold hand-drawn-btn cursor-pointer mb-6">📢 点我听发音找字</button>
+                
+                <div id="options-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-lg mx-auto">
+                    <!-- 动态生成选项 -->
+                </div>
+                <div id="test-feedback" class="text-3xl mt-6 font-bold h-12"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const rawChars = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "上", "下", "左", "右", "大", "小", "多", "少", "土", "个", "入", "人", "儿", "火", "文", "木", "禾", "无", "口", "日", "月", "天", "中", "了", "子", "门", "不", "开", "目", "耳", "头", "米", "见", "白", "田", "电", "也", "长", "山", "出", "飞", "马", "鸟", "云", "公", "车", "牛", "羊", "巾", "牙", "尺", "毛", "卜", "又", "心", "风", "力", "手", "水", "广", "升", "足", "走", "方", "半", "巴", "业", "本", "平", "书", "自", "已", "东", "西", "回", "片", "皮", "生", "里", "果", "几", "用", "鱼", "今", "正", "雨", "两", "瓜", "衣", "来", "年", "万", "百", "丁", "齐", "冬", "说", "友", "话", "春", "朋", "高", "你", "绿", "们", "花", "红", "草", "爷", "亲", "节", "的", "岁", "行", "古", "处", "声", "知", "忙", "洗", "真", "认", "父", "扫", "母", "爸", "写", "全", "完", "关", "家", "看", "笑", "着", "兴", "画", "会", "妈", "合", "奶", "放", "午", "收", "女", "气", "太", "早", "去", "亮", "和", "李", "语", "秀", "千", "香", "听", "远", "唱", "定", "连", "向", "以", "更", "后", "意", "主", "总", "先", "起", "干", "明", "赶", "净", "同", "专", "工", "才", "级", "队", "蚂", "蚁", "前", "房", "空", "网", "诗", "黄", "林", "闭", "童", "立", "是", "我", "朵", "叶", "美", "机", "她", "过", "他", "时", "送", "让", "吗", "往", "吧", "得", "虫", "很", "河", "借", "姐", "呢", "呀", "哪", "谁", "凉", "怕", "量", "跟", "最", "园", "脸", "因", "阳", "为", "光", "可", "法", "石", "找", "办", "许", "别", "那", "到", "都", "吓", "叫", "再", "做", "象", "点", "像", "照", "沙", "海", "桥", "军", "竹", "苗", "井", "面", "乡", "忘", "想", "念", "王", "这", "从", "进", "边", "道", "贝", "男", "原", "爱", "虾", "跑", "吹", "乐", "地", "老", "快", "师", "短", "淡", "对", "热", "冷", "情", "拉", "活", "把", "种", "给", "吃", "练", "学", "习", "非", "苦", "常", "问", "伴", "间", "共", "伙", "汽", "分", "要", "没", "孩", "位", "选", "北", "湖", "南", "秋", "江", "只", "帮", "星", "请", "雪", "就", "球", "跳", "玩", "桃", "树", "刚", "兰", "座", "各", "带", "坐", "急", "名", "发", "成", "动", "晚", "新", "有", "么", "在", "变", "什", "条"];
+
+        const uniqueChars = Array.from(new Set(rawChars));
+        const groupSize = 10;
+        const charGroups = [];
+        for (let i = 0; i < uniqueChars.length; i += groupSize) {
+            charGroups.push(uniqueChars.slice(i, i + groupSize));
+        }
+
+        let currentGroupIndex = 0;
+        let currentSelected = "";
+        let targetChar = "";
+
+        const culturalVideos = [
+            "https://assets.mixkit.co/videos/preview/mixkit-clouds-and-blue-sky-2408-large.mp4",
+            "https://assets.mixkit.co/videos/preview/mixkit-tree-branches-in-the-breeze-1195-large.mp4",
+            "https://assets.mixkit.co/videos/preview/mixkit-waterfall-in-forest-2213-large.mp4",
+        ];
+
+        function initGroups() {
+            const container = document.getElementById("group-buttons");
+            container.innerHTML = "";
+            charGroups.forEach((group, index) => {
+                const btn = document.createElement("button");
+                btn.className = `px-4 py-2 rounded-xl text-lg font-bold hand-drawn-btn cursor-pointer ${index === currentGroupIndex ? 'bg-[#FFB7B2] text-white' : 'bg-[#FFF5EE] text-[#5C4033]'}`;
+                btn.innerText = `第 ${index + 1} 组 (${index * 10 + 1}-${Math.min((index + 1) * 10, uniqueChars.length)})`;
+                btn.onclick = () => selectGroup(index);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectGroup(index) {
+            currentGroupIndex = index;
+            initGroups();
+            renderGroupChars();
+            document.getElementById("display-card").classList.add("hidden");
+        }
+
+        function renderGroupChars() {
+            const group = charGroups[currentGroupIndex];
+            document.getElementById("current-group-title").innerText = `✨ 第 ${currentGroupIndex + 1} 组：快乐识字小天地 ✨`;
+            const grid = document.getElementById("char-grid");
+            grid.innerHTML = "";
+            group.forEach(char => {
+                const btn = document.createElement("button");
+                btn.className = "bg-[#FFFDF9] hover:bg-[#FFE5B4] text-[#E06D53] text-4xl p-6 rounded-2xl hand-drawn-btn cursor-pointer font-bold";
+                btn.innerText = char;
+                btn.onclick = () => selectChar(char);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectChar(char) {
+            currentSelected = char;
+            document.getElementById("display-card").classList.remove("hidden");
+            document.getElementById("card-char").innerText = char;
+            
+            const videoElement = document.getElementById("card-video");
+            const videoSrc = culturalVideos[currentGroupIndex % culturalVideos.length];
+            if(videoElement.src !== videoSrc) {
+                videoElement.src = videoSrc;
+            }
+            speak(char);
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function speakCurrent() {
+            if (currentSelected) speak(currentSelected);
+        }
+
+        function switchTab(tab) {
+            if (tab === 'learn') {
+                document.getElementById('module-learn').classList.remove('hidden');
+                document.getElementById('module-test').classList.add('hidden');
+                document.getElementById('btn-learn').className = "bg-[#FFF5EE] text-[#5C4033] px-6 py-2 rounded-2xl text-xl font-bold hand-drawn-btn cursor-pointer";
+                document.getElementById('btn-test').className = "bg-[#FFB7B2] text-[#5C4033] px-6 py-2 rounded-2xl text-xl font-bold hand-drawn-btn cursor-pointer";
+            } else {
+                document.getElementById('module-learn').classList.add('hidden');
+                document.getElementById('module-test').classList.remove('hidden');
+                document.getElementById('btn-test').className = "bg-[#FFF5EE] text-[#5C4033] px-6 py-2 rounded-2xl text-xl font-bold hand-drawn-btn cursor-pointer";
+                document.getElementById('btn-learn').className = "bg-[#FFB7B2] text-[#5C4033] px-6 py-2 rounded-2xl text-xl font-bold hand-drawn-btn cursor-pointer";
+                startTest();
+            }
+        }
+
+        function startTest() {
+            document.getElementById('test-feedback').innerText = "";
+            let learnedChars = [];
+            for(let i = 0; i <= currentGroupIndex; i++) {
+                learnedChars = learnedChars.concat(charGroups[i]);
+            }
+            if(learnedChars.length > 10) {
+                learnedChars = learnedChars.slice(-10);
+            }
+
+            document.getElementById('test-info').innerText = `当前测试范围：已学习的 ${learnedChars.length} 个汉字中随机抽取`;
+
+            if(learnedChars.length < 2) {
+                document.getElementById('test-feedback').innerText = "💡 请先去学习模块多认识几个字再来测试哦！";
+                document.getElementById('options-grid').innerHTML = "";
+                return;
+            }
+
+            targetChar = learnedChars[Math.floor(Math.random() * learnedChars.length)];
+            
+            let options = [targetChar];
+            while(options.length < Math.min(4, learnedChars.length)) {
+                let randomChar = learnedChars[Math.floor(Math.random() * learnedChars.length)];
+                if(!options.includes(randomChar)) {
+                    options.push(randomChar);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const optGrid = document.getElementById('options-grid');
+            optGrid.innerHTML = "";
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "bg-[#FFFDF9] hover:bg-[#FFE5B4] text-[#CD6155] text-4xl p-6 rounded-2xl hand-drawn-btn cursor-pointer font-bold";
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, learnedChars);
+                optGrid.appendChild(btn);
+            });
+
+            playTargetSound();
+        }
+
+        function playTargetSound() {
+            speak(targetChar);
+        }
+
+        function checkAnswer(selected, learnedChars) {
+            const feedback = document.getElementById('test-feedback');
+            if (selected === targetChar) {
+                feedback.innerHTML = "🌸 太棒啦！找对啦，奖励你小红花！";
+                speak("太棒啦，答对了！");
+                setTimeout(startTest, 2000); 
+            } else {
+                feedback.innerHTML = "💪 没关系，再听一次找找看哦！";
+                speak("再试一次哦");
+            }
+        }
+
+        initGroups();
+        renderGroupChars();
+    </script>
+</body>
+</html>
 
