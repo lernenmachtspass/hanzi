@@ -420,8 +420,41 @@ function exportSave(){
     try{await navigator.clipboard.writeText(code);cp.textContent='✅ 已复制'}
     catch(e){ta.select();document.execCommand('copy');cp.textContent='✅ 已复制'}
   };
+
+  // 下载按钮
+  const dl=h('button','btn','⬇️ 下载');
+  dl.style.background='var(--sky)';
+  dl.onclick=()=>{
+    // 获取当前时间，格式：1999年09月09日23时23分23秒
+    const now=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    const filename=
+      now.getFullYear()+'年'+
+      pad(now.getMonth()+1)+'月'+
+      pad(now.getDate())+'日'+
+      pad(now.getHours())+'时'+
+      pad(now.getMinutes())+'分'+
+      pad(now.getSeconds())+'秒.txt';
+
+    // 创建 TXT 文件并触发下载
+    const blob=new Blob([code],{type:'text/plain;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download=filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    // 释放临时 URL
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+    dl.textContent='✅ 已下载';
+    setTimeout(()=>dl.textContent='⬇️ 下载',1000);
+  };
+  
   const cl=h('button','btn','关闭');cl.style.background='var(--coral)';cl.onclick=()=>ov.remove();
-  row.append(cp,cl);
+  row.append(cp,dl,cl);
   bx.append(h('div','q','💾 保存进度'),tip,ta,row);
   ov.append(bx);document.body.append(ov);
 }
