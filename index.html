@@ -345,10 +345,19 @@ function quiz(mode){
     const o=h('div','opts');
     opts.forEach(x=>{const b=h('button','opt han',x);b.onclick=()=>{
       if(card.dataset.lock)return;
-      if(x===c){card.dataset.lock=1;b.classList.add('ok');beep(true);right++;S.stars++;S.done[c]=1;save();say(c);setTimeout(()=>{n++;next()},mode==='ear'?3600:1900)}
-      else{b.classList.add('no');beep(false)}}
-      o.append(b)});
-    card.append(o);app.append(card);
+      if(b.dataset.wrong)return;           // 这个按钮已答错，忽略
+      if(x===c){
+        card.dataset.lock=1;b.classList.add('ok');beep(true);right++;S.stars++;S.done[c]=1;save();
+        let advanced=false;
+        const advance=()=>{if(advanced)return;advanced=true;n++;next()};
+        speakText(P[c]?`${c}。${P[c][1]}`:c,.65,advance);
+        setTimeout(advance,2500);
+      }else{
+        b.dataset.wrong='1';
+        b.classList.remove('no');void b.offsetWidth;b.classList.add('no');  // 强制重播动画
+        beep(false);
+      }
+    };o.append(b)});
   }
   function end(){
     const e=right>=9?'🏆':right>=6?'🥳':'💪';
