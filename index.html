@@ -485,12 +485,12 @@ function lessonPoem(themeId,level){return (level+(PO[themeId]||0))%POEMS.length;
 function addLib(k){if(!S.lib.includes(k)){S.lib.push(k);save()}}
 function poemTheater(pi,next){
   const p=POEMS[pi];addLib('p:'+pi);
-  theater({head:'🎬 古诗小剧场',icon:'📜',title:p.t,sub:p.a,scenes:p.l.map((l,j)=>[p.e[j],l]),rate:.85,nextLabel:next?next.label:'关闭',next:next&&next.fn});
+  theater({head:'🎬 古诗小剧场',icon:'📜',title:p.t,sub:p.a,scenes:p.l.map((l,j)=>[p.e[j],l]),rate:.6,nextLabel:next?next.label:'关闭',next:next&&next.fn});
 }
 function storyTheater(tid,si,nextLabel){
   const T=THEMES.find(x=>x.id===tid),{b}=storyFor(tid,si*3),sc=storyScenes(b,T.i);
   addLib(`s:${tid}:${si}`);
-  theater({head:`${T.i} ${T.n}小故事`,icon:T.i,title:b[0],sub:'',scenes:sc,highlight:true,rate:.75,nextLabel:nextLabel||'关闭',next:nextLabel&&nextLabel.fn});
+  theater({head:`${T.i} ${T.n}小故事`,icon:T.i,title:b[0],sub:'',scenes:sc,highlight:true,rate:.6,nextLabel:nextLabel||'关闭',next:nextLabel&&nextLabel.fn});
 }
 function library(){
   app.innerHTML='';
