@@ -312,245 +312,52 @@ function unlockAndPlay(level){
 }
 
 /* ===== 测试 ===== */
-/* ===== 测试 ===== */
-function testMenu() {
-  app.innerHTML = '';
-
-  const bar = h('div', 'bar');
-  const bk = h('button', 'back', '← 首页');
-  bk.type = 'button';
-  bk.onclick = home;
-  bar.append(bk);
-  app.append(bar);
-
-  const g = h('div', 'home');
-
-  const mk = (emoji, title, desc, color, action) => {
-    const b = h(
-      'button',
-      'big',
-      `<span class="e">${emoji}</span>${title}<small>${desc}</small>`
-    );
-
-    b.type = 'button';
-    b.style.background = color;
-    b.onclick = action;
-    g.append(b);
-  };
-
-  mk('🖼️', '看图找字', '小图片，找汉字', 'var(--leaf)', () => quiz('pic'));
-  mk('👂', '听音找字', '听声音，找汉字', 'var(--plum)', () => quiz('ear'));
-
-  app.append(g);
-
-  app.append(
-    h(
-      'p',
-      'q',
-      `从学过的 ${CHARS.filter(c => S.done[c]).length} 个字里随机抽，最多 15 题`
-    )
-  );
+function testMenu(){
+  app.innerHTML='';
+  const bar=h('div','bar');const bk=h('button','back','← 首页');bk.onclick=home;bar.append(bk);app.append(bar);
+  const g=h('div','home');
+  const mk=(e,t,s,col,f)=>{const b=h('button','big',`<span class="e">${e}</span>${t}<small>${s}</small>`);b.style.background=col;b.onclick=f;g.append(b)};
+  mk('🖼️','看图找字','小图片，找汉字','var(--leaf)',()=>quiz('pic'));
+  mk('👂','听音找字','听声音，找汉字','var(--plum)',()=>quiz('ear'));
+  app.append(g,h('p','q',`从学过的 ${CHARS.filter(c=>S.done[c]).length} 个字里随机抽，最多 15 题`));
 }
-
-function quiz(mode) {
-  const learned = CHARS.filter(c => S.done[c]);
-
-  // 看图找字：只选择已经学过且有图片的汉字
-  const pool = mode === 'pic'
-    ? learned.filter(c => P[c])
-    : learned;
-
-  const base = mode === 'pic' ? PIC : CHARS;
-
-  if (!pool.length) {
-    app.innerHTML = '';
-
-    const msg = mode === 'pic'
-      ? '学过的字里还没有带图的字，先去学习吧！'
-      : '还没有学过的字，先去学习吧！';
-
-    const card = h(
-      'div',
-      'card result',
-      `<div class="e">📚</div><div class="q">${msg}</div>`
-    );
-
-    const btn = h('button', 'btn', '去学习');
-    btn.type = 'button';
-    btn.style.background = 'var(--sky)';
-    btn.onclick = () => learn(0);
-
-    card.append(btn);
-    app.append(card);
-    return;
+function quiz(mode){
+  const learned=CHARS.filter(c=>S.done[c]);
+  const pool=mode==='pic'?learned.filter(c=>P[c]):learned;
+  const base=mode==='pic'?PIC:CHARS;
+  if(!pool.length){
+    app.innerHTML='';
+    const m=h('div','card result',`<div class="e">📚</div><div class="q">${mode==='pic'?'学过的字里还没有带图的字':'还没有学过的字'}，先去学习吧！</div>`);
+    const b=h('button','btn','去学习');b.style.background='var(--sky)';b.onclick=()=>learn(0);m.append(b);app.append(m);return;
   }
-
-  const qs = shuffle(pool).slice(0, 15);
-
-  let n = 0;
-  let right = 0;
-
-  function next() {
-    app.innerHTML = '';
-
-    if (n >= qs.length) {
-      end();
-      return;
-    }
-
-    const c = qs[n];
-
-    // 生成两个干扰选项，并避免重复
-    const candidates = [
-      ...new Set([
-        ...shuffle(pool.filter(x => x !== c)),
-        ...shuffle(base.filter(x => x !== c))
-      ])
-    ];
-
-    const others = candidates.slice(0, 2);
-    const opts = shuffle([c, ...others]);
-
-    const bar = h('div', 'bar');
-
-    const back = h('button', 'back', '← 退出');
-    back.type = 'button';
-    back.onclick = testMenu;
-
-    bar.append(back);
-    app.append(bar);
-
-    const progress = h(
-      'div',
-      'prog',
-      `<b style="width:${n / qs.length * 100}%"></b>`
-    );
-
-    app.append(progress);
-
-    const card = h('div', 'card');
-
-    if (mode === 'pic') {
-      card.append(media(c));
-      card.append(h('div', 'q', '这是哪个字？'));
-    } else {
-      card.append(h('div', 'q', '听一听，是哪个字？'));
-
-      const replay = h('button', 'btn', '🔊 再听一遍');
-      replay.type = 'button';
-      replay.style.background = 'var(--sky)';
-      replay.onclick = () => say(c);
-
-      card.append(replay);
-
-      // 稍等一下再播放题目语音
-      setTimeout(() => {
-        // 防止已经切换题目后又播放上一题
-        if (app.contains(card) && mode === 'ear') {
-          say(c);
-        }
-      }, 250);
-    }
-
-    const options = h('div', 'opts');
-
-    opts.forEach(x => {
-      const btn = h('button', 'opt han', x);
-
-      btn.type = 'button';
-      btn.dataset.answer = x;
-
-      options.append(btn);
-    });
-
-    // 使用事件委托，统一处理所有选项点击
-    options.addEventListener('click', event => {
-      const btn = event.target.closest('button.opt');
-
-      if (!btn || !options.contains(btn)) return;
-      if (card.dataset.lock === '1') return;
-      if (btn.disabled) return;
-
-      const answer = btn.dataset.answer;
-
-      if (answer === c) {
-        // 锁定本题，防止连续点击导致重复计分
-        card.dataset.lock = '1';
-
-        options.querySelectorAll('button.opt').forEach(option => {
-          option.disabled = true;
-
-          if (option === btn) {
-            option.classList.add('ok');
-          }
-        });
-
-        right++;
-        S.stars++;
-
-        // 确保答题记录存在，避免重复修改其他进度
-        save();
-
-        beep(true);
-        say(c);
-
-        // 听音模式多留一点时间，让孩子听完反馈
-        const delay = mode === 'ear' ? 2600 : 1500;
-
-        setTimeout(() => {
-          n++;
-          next();
-        }, delay);
-
-      } else {
-        btn.classList.add('no');
-        beep(false);
-
-        // 错误选项短暂显示红色，随后允许再次选择
-        setTimeout(() => {
-          btn.classList.remove('no');
-        }, 600);
-      }
-    });
-
-    card.append(options);
-    app.append(card);
+  const qs=shuffle(pool).slice(0,15);let n=0,right=0;
+  function next(){
+    app.innerHTML='';
+    if(n>=qs.length)return end();
+    const c=qs[n];
+    const others=[...new Set([...shuffle(pool.filter(x=>x!==c)),...shuffle(base.filter(x=>x!==c))])].slice(0,2);
+    const opts=shuffle([c,...others]);
+    const bar=h('div','bar');const bk=h('button','back','← 退出');bk.onclick=testMenu;
+    const pr=h('div','prog',`<b style="width:${n/qs.length*100}%"></b>`);bar.append(bk);app.append(bar,pr);
+    const card=h('div','card');
+    if(mode==='pic'){card.append(media(c));card.append(h('div','q','这是哪个字？'))}
+    else{const b=h('button','btn','🔊 再听一遍');b.style.background='var(--sky)';b.onclick=()=>say(c);card.append(h('div','q','听一听，是哪个字？'),b);setTimeout(()=>say(c),900)}
+    const o=h('div','opts');
+    opts.forEach(x=>{const b=h('button','opt han',x);b.onclick=()=>{
+      if(card.dataset.lock)return;
+      if(x===c){card.dataset.lock=1;b.classList.add('ok');beep(true);right++;S.stars++;S.done[c]=1;save();say(c);setTimeout(()=>{n++;next()},mode==='ear'?3600:1900)}
+      else{b.classList.add('no');beep(false)}}
+      o.append(b)});
+    card.append(o);app.append(card);
   }
-
-  function end() {
-    const emoji = right >= 9
-      ? '🏆'
-      : right >= 6
-        ? '🥳'
-        : '💪';
-
-    const result = h(
-      'div',
-      'card result',
-      `<div class="e">${emoji}</div>
-       <div class="q">答对 ${right} / ${qs.length}，得到 ${right} 颗星！</div>`
-    );
-
-    const row = h('div', 'row');
-
-    const again = h('button', 'btn', '再玩一次');
-    again.type = 'button';
-    again.style.background = 'var(--coral)';
-    again.onclick = () => quiz(mode);
-
-    const homeBtn = h('button', 'btn', '回首页');
-    homeBtn.type = 'button';
-    homeBtn.style.background = 'var(--sky)';
-    homeBtn.onclick = home;
-
-    row.append(again, homeBtn);
-    result.append(row);
-    app.append(result);
-
-    beep(true);
-    setTimeout(giveSticker, 900);
+  function end(){
+    const e=right>=9?'🏆':right>=6?'🥳':'💪';
+    const r=h('div','card result',`<div class="e">${e}</div><div class="q">答对 ${right} / ${qs.length}，得到 ${right} 颗星！</div>`);
+    const row=h('div','row');
+    const a=h('button','btn','再玩一次');a.style.background='var(--coral)';a.onclick=()=>quiz(mode);
+    const b=h('button','btn','回首页');b.style.background='var(--sky)';b.onclick=home;
+    row.append(a,b);r.append(row);app.append(r);beep(true);setTimeout(giveSticker,900);
   }
-
   next();
 }
 
