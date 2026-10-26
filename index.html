@@ -186,46 +186,17 @@ function bestVoice(){
   const sc=v=>/natural|neural|online/i.test(v.name)?5:/premium|enhanced|siri|xiaoxiao|xiaoyi|yunxi/i.test(v.name)?4:/google/i.test(v.name)?3:/tingting|meijia|huihui|female|女/i.test(v.name)?2:1;
   return vs.sort((x,y)=>sc(y)-sc(x))[0];
 }
-
-function tts(w, rate, onend) {
-  let finished = false;
-
-  const finish = () => {
-    if (finished) return;
-    finished = true;
-    if (typeof onend === "function") onend();
-  };
-
-  try {
-    const text = String(w || "").trim();
-
-    if (!text) {
-      finish();
-      return;
-    }
-
-    if (!("speechSynthesis" in window)) {
-      finish();
-      return;
-    }
-
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "zh-CN";
-    u.pitch = 1;
-    u.rate = rate || 0.65;
-
-    const v = bestVoice();
-    if (v) u.voice = v;
-
-    u.onend = finish;
-    u.onerror = finish;
-
-    speechSynthesis.speak(u);
-  } catch (e) {
-    finish();
-  }
+function tts(w,rate,onend){
+  try{
+    const u=new SpeechSynthesisUtterance(w);u.lang='zh-CN';
+    const v=bestVoice();if(v)u.voice=v;
+    u.pitch=1;u.rate=rate||.65;
+    let fired=false;const finish=()=>{if(fired)return;fired=true;if(typeof onend==='function')onend()};
+    u.onend=finish;u.onerror=finish;speechSynthesis.speak(u);
+  }catch(e){if(typeof onend==='function')onend()}
 }
-
+try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
+let AC;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const n=ok?[660,880,1100]:[220];n.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.type='triangle';g.gain.value=.15;o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.1);o.stop(AC.currentTime+i*.1+.15)})}catch(e){}}
 
 /* ===== 图片 ===== */
 function media(c){
