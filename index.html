@@ -335,7 +335,14 @@ function quiz(mode){
     app.innerHTML='';
     if(n>=qs.length)return end();
     const c=qs[n];
-    const others=[...new Set([...shuffle(pool.filter(x=>x!==c)),...shuffle(base.filter(x=>x!==c))])].slice(0,2);
+    const seen=new Set([c]);const others=[];
+    for(const src of [pool,base,CHARS]){
+      for(const x of shuffle(src)){
+        if(others.length>=2)break;
+        if(!seen.has(x)){seen.add(x);others.push(x)}
+      }
+      if(others.length>=2)break;
+    }
     const opts=shuffle([c,...others]);
     const bar=h('div','bar');const bk=h('button','back','← 退出');bk.onclick=testMenu;
     const pr=h('div','prog',`<b style="width:${n/qs.length*100}%"></b>`);bar.append(bk);app.append(bar,pr);
@@ -343,21 +350,31 @@ function quiz(mode){
     if(mode==='pic'){card.append(media(c));card.append(h('div','q','这是哪个字？'))}
     else{const b=h('button','btn','🔊 再听一遍');b.style.background='var(--sky)';b.onclick=()=>say(c);card.append(h('div','q','听一听，是哪个字？'),b);setTimeout(()=>say(c),900)}
     const o=h('div','opts');
-    opts.forEach(x=>{const b=h('button','opt han',x);b.onclick=()=>{
-      if(card.dataset.lock)return;
-      if(b.dataset.wrong)return;           // 这个按钮已答错，忽略
-      if(x===c){
-        card.dataset.lock=1;b.classList.add('ok');beep(true);right++;S.stars++;S.done[c]=1;save();
-        let advanced=false;
-        const advance=()=>{if(advanced)return;advanced=true;n++;next()};
-        speakText(P[c]?`${c}。${P[c][1]}`:c,.65,advance);
-        setTimeout(advance,2500);
-      }else{
-        b.dataset.wrong='1';
-        b.classList.remove('no');void b.offsetWidth;b.classList.add('no');  // 强制重播动画
-        beep(false);
-      }
-    };o.append(b)});
+    let locked=false;
+    opts.forEach(x=>{
+      const b=h('button','opt han',x);
+      b.onclick=()=>{
+        if(locked)return;
+        if(b.dataset.wrong)return;
+        if(x===c){
+          locked=true;
+          b.classList.add('ok');
+          beep(true);
+          right++;S.stars++;S.done[c]=1;save();
+          let advanced=false;
+          const advance=()=>{if(advanced)return;advanced=true;n++;next()};
+          speakText(P[c]?`${c}。${P[c][1]}`:c,.65,advance);
+          setTimeout(advance,2500);
+        }else{
+          b.dataset.wrong='1';
+          b.classList.remove('no');void b.offsetWidth;b.classList.add('no');
+          beep(false);
+        }
+      };
+      o.append(b);
+    });
+    card.append(o);
+    app.append(card);
   }
   function end(){
     const e=right>=9?'🏆':right>=6?'🥳':'💪';
@@ -369,7 +386,6 @@ function quiz(mode){
   }
   next();
 }
-
 /* ===== emoji 转插画 ===== */
 const ERE=/\p{Extended_Pictographic}(?:\uFE0F|\u20E3|[\u{1F3FB}-\u{1F3FF}]|\u200D\p{Extended_Pictographic}\uFE0F?)*/gu;
 const OM='https://cdn.jsdelivr.net/npm/openmoji@15.0.0/color/svg/';
