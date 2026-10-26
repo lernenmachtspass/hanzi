@@ -42,7 +42,7 @@ button:hover{filter:brightness(1.04)}button:active{transform:scale(.96)}
 .pic img,.pic video{width:100%;height:100%;object-fit:contain}
 .bigchar{font-size:min(36vw,190px);flex:none;line-height:1;background:linear-gradient(160deg,#FF8FAE,#9A7BF0);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
 .word{font-size:26px;color:var(--soft)}
-#writer{width:220px;height:220px;border-radius:18px;border:3px solid #F4A3B8;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 0V100M0 50H100M0 0L100 100M100 0L0 100' stroke='%23F4A3B8' stroke-width='1' stroke-dasharray='4 3' fill='none'/></svg>") center/100% 100% no-repeat}
+#writer{touch-action:none;-webkit-user-select:none;user-select:none;width:220px;height:220px;border-radius:18px;border:3px solid #F4A3B8;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><path d='M50 0V100M0 50H100M0 0L100 100M100 0L0 100' stroke='%23F4A3B8' stroke-width='1' stroke-dasharray='4 3' fill='none'/></svg>") center/100% 100% no-repeat}
 .row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
 .btn{position:relative;overflow:hidden;border-radius:99px;padding:13px 26px;font-size:24px;color:#3D3260;box-shadow:0 8px 18px rgba(190,140,170,.3)}
 .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:14px;width:100%}
@@ -61,10 +61,28 @@ img.em{height:1em;width:1em;vertical-align:-.14em;display:inline-block;pointer-e
 .stage{min-height:240px;display:grid;place-items:center;align-content:center;gap:8px;text-align:center;width:100%;background:linear-gradient(160deg,#E4F1FF,#FDE9F1);border-radius:28px;padding:16px;color:#3D3260}
 .sc{font-size:110px;line-height:1.1;animation:pop .6s}
 .ln{font-size:min(9vw,44px)}
+
+.cab{background:linear-gradient(160deg,#fff,#F7EFE8);border:8px solid #D4A574;border-radius:24px;padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;box-shadow:var(--shadow),inset 0 0 0 3px #F0D9BD}
+.shelf{display:grid;place-items:center;gap:2px;padding:10px 6px 4px;border-bottom:10px solid #D4A574;background:linear-gradient(160deg,rgba(169,212,255,.25),rgba(255,255,255,.1));border-radius:10px 10px 0 0;min-height:132px;color:#3D3260;text-align:center;font-size:16px}
+.shelf svg{width:100%;max-width:150px;height:auto}
+.shelf.empty{opacity:.55;font-size:36px;color:#B7A9CF}
+.tbig svg{width:min(300px,80vw);height:auto}
+#writer svg{touch-action:none}
+:root{--t1:#A8E6CF;--t2:#FFE29A}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(70% 45% at 100% 0%,color-mix(in srgb,var(--t1) 55%,transparent),transparent 70%),radial-gradient(70% 45% at 0% 100%,color-mix(in srgb,var(--t2) 50%,transparent),transparent 70%)}
+.hr{display:flex;gap:8px;align-items:center}
+#thm{color:var(--ink);font-size:18px}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;width:100%}
+.tcard{border-radius:26px;padding:16px 8px;font-size:22px;color:#3D3260;box-shadow:var(--shadow);border:4px solid transparent}
+.tcard.on{border-color:#8E6CF0}
+.tcard .te{display:block;font-size:54px;margin-bottom:4px}
+.stk{display:grid;place-items:center;width:96px;height:96px;font-size:60px;background:#fff;border-radius:28px;box-shadow:0 0 0 4px #fff,0 0 0 6px #F0DDE8,0 8px 16px rgba(0,0,0,.14)}
+.tbig .stk{width:170px;height:170px;font-size:104px;margin:10px}
+.shelf .stk{margin:6px 0}
 </style>
 </head>
 <body>
-<header><h1>🐣 小小识字乐园</h1><div class="stars" id="stars">⭐ 0</div></header>
+<header><h1>🐣 小小识字乐园</h1><div class="hr"><button class="stars" id="thm"></button><div class="stars" id="stars">⭐ 0</div></div></header>
 <main id="app"></main>
 
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5.0/dist/hanzi-writer.min.js"></script>
@@ -73,43 +91,55 @@ img.em{height:1em;width:1em;vertical-align:-.14em;display:inline-block;pointer-e
 const RAW="一二三四五六七八九十上下左右大小多少土个入人儿火文木禾无口日月天中了子门不开目耳头米见白田电也长山出飞马鸟云公车牛羊巾牙尺毛卜又心风力手水广升足走方半巴业本平书自已东西回片皮生里果几用鱼今正雨两瓜衣来年万百丁齐冬说友话春朋高你绿们花红草爷亲节的岁行古处声知忙洗真认父扫母爸写全完关家看笑着兴画会妈合奶放午收女气太早去亮和李语秀千香听远唱定连向以更后意主总先起干明赶净同专工才级队蚂蚁前房空网诗黄林闭童立是我朵叶美机她过他时送让吗往吧得虫很河借姐呢呀哪谁凉怕量跟最园脸因阳为光可法石找办许别那到都吓叫再做象点像照沙海桥军竹苗井面乡忘想念王这从进边道贝男原爱虾跑吹乐地老快师短淡对热冷情拉活把种给吃练学习非苦常问伴间共伙汽分要没孩位选北湖南秋江只帮星请雪就球跳玩桃树刚兰座各带坐急名发成动晚新有么在变什条";
 const CHARS=[...new Set(RAW)];
 /* 有图的字: 字:[图片emoji, 词语]。想用自己的图/视频: 放进 assets/img/字.png 和 assets/video/字.mp4 即可 */
-const P={一:['🌙','一个月亮'],二:['👀','两只眼睛'],三:['🐷','三只小猪'],四:['🍀','四叶草'],五:['🖐️','五个手指'],六:['🎲','六点'],七:['🌈','七色彩虹'],八:['🐙','八条腿'],九:['🕘','九点钟'],十:['🙌','十个手指'],
-上:['⬆️','上面'],下:['⬇️','下面'],左:['⬅️','左边'],右:['➡️','右边'],大:['🐘','大象'],小:['🐜','小蚂蚁'],土:['🪴','泥土'],人:['🧑','大人'],儿:['👶','儿童'],火:['🔥','火焰'],木:['🪵','木头'],禾:['🌾','禾苗'],口:['👄','嘴巴'],日:['☀️','太阳'],月:['🌙','月亮'],天:['🌤️','天空'],子:['👦','孩子'],门:['🚪','大门'],开:['🔓','打开'],目:['👁️','眼睛'],耳:['👂','耳朵'],头:['🙂','头'],米:['🍚','大米'],田:['🌾','稻田'],电:['⚡','闪电'],山:['⛰️','高山'],飞:['✈️','飞机'],马:['🐴','小马'],鸟:['🐦','小鸟'],云:['☁️','白云'],车:['🚗','汽车'],牛:['🐮','奶牛'],羊:['🐑','绵羊'],牙:['🦷','牙齿'],毛:['🧶','毛线'],心:['❤️','爱心'],风:['🌬️','大风'],手:['✋','小手'],水:['💧','水滴'],足:['🦶','脚'],书:['📖','图书'],鱼:['🐟','小鱼'],雨:['🌧️','下雨'],瓜:['🍉','西瓜'],衣:['👕','衣服'],冬:['⛄','冬天'],春:['🌷','春天'],花:['🌸','花朵'],红:['🍓','红色'],绿:['🥬','绿色'],黄:['🍋','黄色'],白:['🥛','白色'],草:['🌱','小草'],家:['🏠','我的家'],看:['👀','看一看'],笑:['😄','笑一笑'],画:['🖼️','画画'],果:['🍎','水果'],听:['🎧','听一听'],唱:['🎤','唱歌'],写:['✍️','写字'],洗:['🧼','洗手'],爸:['👨','爸爸'],妈:['👩','妈妈'],奶:['👵','奶奶'],爷:['👴','爷爷'],女:['👧','女孩'],男:['👦','男孩'],蚂:['🐜','蚂蚁'],蚁:['🐜','蚂蚁'],房:['🏡','房子'],网:['🕸️','蜘蛛网'],林:['🌳','树林'],叶:['🍃','树叶'],树:['🌲','大树'],朵:['🌼','花朵'],虫:['🐛','毛毛虫'],河:['🏞️','小河'],脸:['🙂','小脸'],光:['💡','灯光'],石:['🪨','石头'],海:['🌊','大海'],桥:['🌉','大桥'],竹:['🎋','竹子'],井:['⛲','水井'],王:['👑','国王'],爱:['💕','爱你'],虾:['🦐','小虾'],跑:['🏃','跑步'],吹:['🎈','吹气球'],吃:['🍽️','吃饭'],球:['⚽','足球'],桃:['🍑','桃子'],星:['⭐','星星'],雪:['❄️','下雪'],湖:['🦆','湖水'],汽:['🚌','汽车'],玩:['🧸','玩具'],跳:['🤸','跳高'],笔:['🖊️','笔'],南:['🧭','南方'],北:['🧭','北方'],东:['🌅','东方'],西:['🌇','西方'],秋:['🍂','秋天'],热:['🥵','很热'],冷:['🥶','很冷'],快:['🐇','快跑'],老:['🧓','老人'],亮:['🌟','明亮'],明:['💡','明亮'],脸:['🙂','小脸'],美:['🌺','美丽'],园:['🏞️','公园'],座:['💺','座位'],帽:['🧢','帽子']};
+/*P-START*/const P={一:['🌙','一个月亮'],二:['👀','两只眼睛'],三:['🐷','三只小猪'],四:['🍀','四叶草'],五:['🖐️','五个手指'],六:['🎲','六点'],七:['🌈','七色彩虹'],八:['🐙','八条腿'],九:['🕘','九点钟'],十:['🙌','十个手指'],
+上:['⬆️','上面'],下:['⬇️','下面'],左:['⬅️','左边'],右:['➡️','右边'],大:['🐘','大象'],小:['🐜','小蚂蚁'],土:['🪴','泥土'],人:['🧑','大人'],儿:['👶','儿童'],火:['🔥','火焰'],木:['🪵','木头'],禾:['🌾','禾苗'],口:['👄','嘴巴'],日:['☀️','太阳'],月:['🌙','月亮'],天:['🌤️','天空'],子:['👦','孩子'],门:['🚪','大门'],开:['🔓','打开'],目:['👁️','眼睛'],耳:['👂','耳朵'],头:['🙂','头'],米:['🍚','大米'],田:['🌾','稻田'],电:['⚡','闪电'],山:['⛰️','高山'],飞:['✈️','飞机'],马:['🐴','小马'],鸟:['🐦','小鸟'],云:['☁️','白云'],车:['🚗','汽车'],牛:['🐮','奶牛'],羊:['🐑','绵羊'],牙:['🦷','牙齿'],毛:['🧶','毛线'],心:['❤️','爱心'],风:['🌬️','大风'],手:['✋','小手'],水:['💧','水滴'],足:['🦶','脚'],书:['📖','图书'],鱼:['🐟','小鱼'],雨:['🌧️','下雨'],瓜:['🍉','西瓜'],衣:['👕','衣服'],冬:['⛄','冬天'],春:['🌷','春天'],花:['🌸','花朵'],红:['🍓','红色'],绿:['🥬','绿色'],黄:['🍋','黄色'],白:['🥛','白色'],草:['🌱','小草'],家:['🏠','我的家'],看:['👀','看一看'],笑:['😄','笑一笑'],画:['🖼️','画画'],果:['🍎','水果'],听:['🎧','听一听'],唱:['🎤','唱歌'],写:['✍️','写字'],洗:['🧼','洗手'],爸:['👨','爸爸'],妈:['👩','妈妈'],奶:['👵','奶奶'],爷:['👴','爷爷'],女:['👧','女孩'],男:['👦','男孩'],蚂:['🐜','蚂蚁'],蚁:['🐜','蚂蚁'],房:['🏡','房子'],网:['🕸️','蜘蛛网'],林:['🌳','树林'],叶:['🍃','树叶'],树:['🌲','大树'],朵:['🌼','花朵'],虫:['🐛','毛毛虫'],河:['🏞️','小河'],脸:['🙂','小脸'],光:['💡','灯光'],石:['🪨','石头'],海:['🌊','大海'],桥:['🌉','大桥'],竹:['🎋','竹子'],井:['⛲','水井'],王:['👑','国王'],爱:['💕','爱你'],虾:['🦐','小虾'],跑:['🏃','跑步'],吹:['🎈','吹气球'],吃:['🍽️','吃饭'],球:['⚽','足球'],桃:['🍑','桃子'],星:['⭐','星星'],雪:['❄️','下雪'],湖:['🦆','湖水'],汽:['🚌','汽车'],玩:['🧸','玩具'],跳:['🤸','跳高'],笔:['🖊️','笔'],南:['🧭','南方'],北:['🧭','北方'],东:['🌅','东方'],西:['🌇','西方'],秋:['🍂','秋天'],热:['🥵','很热'],冷:['🥶','很冷'],快:['🐇','快跑'],老:['🧓','老人'],亮:['🌟','明亮'],明:['💡','明亮'],脸:['🙂','小脸'],美:['🌺','美丽'],园:['🏞️','公园'],座:['💺','座位'],帽:['🧢','帽子']};/*P-END*/
 const LV=[];for(let i=0;i<CHARS.length;i+=12)LV.push(CHARS.slice(i,i+12));
 const PIC=CHARS.filter(c=>P[c]);
 
 /* ===== 状态 ===== */
 const $=s=>document.querySelector(s),app=$('#app');
-let S={done:{},stars:0};try{S=Object.assign(S,JSON.parse(localStorage.getItem('hanzi')||'{}'))}catch(e){}
-const save=()=>{try{localStorage.setItem('hanzi',JSON.stringify(S))}catch(e){}$('#stars').textContent='⭐ '+S.stars};
+/* ===== 存档: 每个主题的进度完全独立 (已学字、星星、奖励次数、视频库、收藏柜各存各的) ===== */
+const blank=()=>({done:{},stars:0,rewarded:0,lib:[],coll:[]});
+let S={theme:'train',themeChosen:false,done:{},stars:0,rewarded:0,lib:[],coll:{}},ALL={};
+try{
+  const r=JSON.parse(localStorage.getItem('hanzi')||'{}');
+  if(r.v===2){S.theme=r.theme||'train';S.themeChosen=!!r.themeChosen;ALL=r.data||{}}
+  else if(r.done||r.stars||r.coll||r.lib||r.trains){ /* 旧版存档: 拆分到各主题 */
+    const th=r.theme||'train';S.theme=th;S.themeChosen=!!r.themeChosen;
+    ALL[th]=Object.assign(blank(),{done:r.done||{},stars:r.stars||0,rewarded:r.rewarded||0});
+    (r.lib||[]).forEach(k=>{const m=k.match(/^s:([^:]+):/),id=m?m[1]:th;(ALL[id]=ALL[id]||blank()).lib.push(k)});
+    Object.entries(r.coll||{}).forEach(([id,l])=>{(ALL[id]=ALL[id]||blank()).coll=l});
+    if(r.trains&&r.trains.length&&!(ALL.train&&ALL.train.coll.length))(ALL.train=ALL.train||blank()).coll=r.trains.map(t=>({tr:t,n:t.n}));
+  }
+}catch(e){}
+function loadTheme(){const d=ALL[S.theme]||blank();S.done=d.done||{};S.stars=d.stars||0;S.rewarded=d.rewarded||0;S.lib=d.lib||[];S.coll={[S.theme]:d.coll||[]}}
+loadTheme();
+const save=()=>{ALL[S.theme]={done:S.done,stars:S.stars,rewarded:S.rewarded,lib:S.lib,coll:S.coll[S.theme]||[]};try{localStorage.setItem('hanzi',JSON.stringify({v:2,theme:S.theme,themeChosen:S.themeChosen,data:ALL}))}catch(e){}$('#stars').textContent='⭐ '+S.stars};
 save();
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
 const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.innerHTML=x;return e};
 
 /* ===== 声音 ===== */
-let CUR;
-/* 有真人录音的字，写在这里，例如: new Set(['鱼','日','月']) ，录音放 assets/audio/字.mp3 */
-const RECORDED=new Set([]);
-function say(c){
-  try{speechSynthesis.cancel()}catch(e){}
-  try{CUR&&CUR.pause()}catch(e){}
-  if(!RECORDED.has(c)){tts(c);return}
-  const a=new Audio(`assets/audio/${c}.mp3`);CUR=a;
-  a.onerror=()=>tts(c);
-  a.play().catch(()=>tts(c));
+/* ===== 声音: 优先播放 assets/audio 里的真人感语音 (用 gen_audio.py 生成), 没有就用浏览器语音 ===== */
+let CUR,M={};
+fetch('assets/audio/manifest.json').then(r=>r.ok?r.json():{}).then(j=>{M=j||{}}).catch(()=>{});
+function silence(){try{speechSynthesis.cancel()}catch(e){}try{CUR&&CUR.pause()}catch(e){}}
+function say(c){speakText(P[c]?`${c}。${P[c][1]}`:c)}
+function speakText(w,rate){
+  silence();
+  if(M[w]){const a=new Audio('assets/audio/'+M[w]);CUR=a;a.onerror=()=>tts(w,rate);a.play().catch(()=>tts(w,rate));return}
+  tts(w,rate);
 }
-function tts(c){
-  try{
-    speakText(P[c]?`${c}。${P[c][1]}`:c);
-  }catch(e){}
+function bestVoice(){
+  const vs=speechSynthesis.getVoices().filter(v=>/zh|cmn/i.test(v.lang));
+  const sc=v=>/natural|neural|online/i.test(v.name)?5:/premium|enhanced|siri|xiaoxiao|xiaoyi|yunxi/i.test(v.name)?4:/google/i.test(v.name)?3:/tingting|meijia|huihui|female|女/i.test(v.name)?2:1;
+  return vs.sort((x,y)=>sc(y)-sc(x))[0];
 }
-function speakText(w){
+function tts(w,rate){
   try{
     const u=new SpeechSynthesisUtterance(w);u.lang='zh-CN';
-    const vs=speechSynthesis.getVoices().filter(v=>/zh|cmn/i.test(v.lang));
-    const v=vs.find(v=>/Tingting|Meijia|Xiaoxiao|Xiaoyi|Huihui|Yaoyao|female|女/i.test(v.name))||vs[0];
-    if(v)u.voice=v;
-    u.pitch=1.15;u.rate=.6; /* 接近自然人声；想更童声可把 pitch 调到 1.3 */
+    const v=bestVoice();if(v)u.voice=v;
+    u.pitch=1;u.rate=rate||.65;
     speechSynthesis.speak(u);
   }catch(e){}
 }
@@ -132,9 +162,12 @@ function home(){
   const g=h('div','home');
   const a=h('button','big','<span class="e">📚</span>学习<small>看一看 · 听一听 · 写一写</small>');a.style.background='linear-gradient(135deg,#A9D4FF,#CDB4F6)';a.onclick=()=>learn(0);
   const b=h('button','big','<span class="e">🎯</span>测试<small>听声音 · 看图片 · 找汉字</small>');b.style.background='linear-gradient(135deg,#FFC4D4,#FFD9A8)';b.onclick=testMenu;
-  g.append(a,b);app.append(g);
+  const T=curTheme(),tr=h('button','big',`<span class="e">${T.i}</span>${T.coll}<small>已收集 ${(S.coll[T.id]||[]).length} 个 · 每 24 颗星得 1 个</small>`);tr.style.background=`linear-gradient(135deg,${T.t[0]},${T.t[1]})`;tr.onclick=museum;
+  const lb=h('button','big',`<span class="e">🎞️</span>视频库<small>已解锁 ${S.lib.length} 个古诗和故事</small>`);lb.style.background='linear-gradient(135deg,#FFC4D4,#E8D5FF)';lb.onclick=library;
+  g.append(a,b,tr,lb);app.append(g);
   const n=Object.keys(S.done).length;
   app.append(h('p','q',`已经认识 <b>${n}</b> / ${CHARS.length} 个字`));
+  checkReward();
 }
 
 /* ===== 学习 ===== */
@@ -150,7 +183,7 @@ function learn(lv){
 let writer;
 function showCard(lv,i){
   const list=LV[lv],c=list[i];const isNew=!S.done[c];S.done[c]=1;save();say(c);
-  if(isNew){const n=Object.keys(S.done).length;if(n%10===0)setTimeout(()=>poem(n/10-1),2200)}
+  checkReward();
   app.innerHTML='';
   const bar=h('div','bar');const bk=h('button','back','← 返回');bk.onclick=()=>learn(lv);bar.append(bk,h('span','q',`${i+1} / ${list.length}`));app.append(bar);
   const card=h('div','card');
@@ -158,15 +191,22 @@ function showCard(lv,i){
   const big=h('div','bigchar han',c);m.append(big);card.append(m);
   if(P[c])card.append(h('div','word',P[c][1]));
   const w=h('div','');w.id='writer';card.append(w);
+  const tip=h('div','word','点「描红」，用手指描一描');card.append(tip);
   const r=h('div','row');
   const mk=(t,col,f)=>{const b=h('button','btn',t);b.style.background=col;b.onclick=f;r.append(b)};
   mk('🔊 听','var(--sky)',()=>say(c));
-  mk('✍️ 写','var(--plum)',()=>anim());
+  mk('▶️ 笔顺','var(--plum)',()=>{try{writer.cancelQuiz()}catch(e){}tip.textContent='看一看，笔画是这样写的';anim()});
+  mk('🖍️ 描红','var(--leaf)',()=>trace());
   if(i>0)mk('⬅️','var(--leaf)',()=>card_(lv,i-1));
   mk(i<list.length-1?'下一个 ➡️':'🎉 完成','var(--coral)',()=>i<list.length-1?card_(lv,i+1):(beep(true),learn(lv)));
   card.append(r);app.append(card);
   function anim(){try{writer.animateCharacter()}catch(e){}}
-  try{writer=HanziWriter.create('writer',c,{width:220,height:220,padding:16,strokeColor:'#FF7FA0',radicalColor:'#7FB6F5',strokeAnimationSpeed:.5,delayBetweenStrokes:600,showOutline:true,outlineColor:'#EBDDE3',onLoadCharDataError:()=>{w.style.display='none'}});anim()}catch(e){w.style.display='none'}
+  function trace(){try{
+    writer.cancelQuiz();
+    writer.quiz({leniency:1.6,showHintAfterMisses:2,highlightOnComplete:true,onComplete:()=>{beep(true);tip.textContent='太棒了，描好啦！🎉 点「描红」再描一次'}});
+    tip.textContent='用手指沿着浅色的字，一笔一笔描';
+  }catch(e){}}
+  try{writer=HanziWriter.create('writer',c,{width:220,height:220,padding:16,strokeColor:'#FF7FA0',radicalColor:'#7FB6F5',strokeAnimationSpeed:.5,delayBetweenStrokes:600,showOutline:true,outlineColor:'#E3CFD9',drawingWidth:18,drawingColor:'#FF7FA0',highlightColor:'#7ED7B6',onLoadCharDataError:()=>{w.style.display='none'}});anim()}catch(e){w.style.display='none'}
   function card_(a,b){showCard(a,b)}
 }
 
@@ -200,11 +240,11 @@ function quiz(mode){
     const pr=h('div','prog',`<b style="width:${n/qs.length*100}%"></b>`);bar.append(bk);app.append(bar,pr);
     const card=h('div','card');
     if(mode==='pic'){card.append(media(c));card.append(h('div','q','这是哪个字？'))}
-    else{const b=h('button','btn','🔊 再听一遍');b.style.background='var(--sky)';b.onclick=()=>say(c);card.append(h('div','q','听一听，是哪个字？'),b);setTimeout(()=>say(c),300)}
+    else{const b=h('button','btn','🔊 再听一遍');b.style.background='var(--sky)';b.onclick=()=>say(c);card.append(h('div','q','听一听，是哪个字？'),b);setTimeout(()=>say(c),900)}
     const o=h('div','opts');
     opts.forEach(x=>{const b=h('button','opt han',x);b.onclick=()=>{
       if(card.dataset.lock)return;
-      if(x===c){card.dataset.lock=1;b.classList.add('ok');beep(true);right++;S.stars++;S.done[c]=1;save();say(c);setTimeout(()=>{n++;next()},1100)}
+      if(x===c){card.dataset.lock=1;b.classList.add('ok');beep(true);right++;S.stars++;S.done[c]=1;save();say(c);setTimeout(()=>{n++;next()},mode==='ear'?3600:1900)}
       else{b.classList.add('no');beep(false)}}
       o.append(b)});
     card.append(o);app.append(card);
@@ -215,7 +255,7 @@ function quiz(mode){
     const row=h('div','row');
     const a=h('button','btn','再玩一次');a.style.background='var(--coral)';a.onclick=()=>quiz(mode);
     const b=h('button','btn','回首页');b.style.background='var(--sky)';b.onclick=home;
-    row.append(a,b);r.append(row);app.append(r);beep(true);
+    row.append(a,b);r.append(row);app.append(r);beep(true);setTimeout(giveSticker,900);
   }
   next();
 }
@@ -245,7 +285,8 @@ function conv(root){
 }
 const mo=new MutationObserver(()=>{mo.disconnect();conv(document.body);mo.observe(document.body,{childList:true,subtree:true,characterData:true})});
 
-/* ===== 古诗小剧场: 每学会 10 个新字播放一次 ===== */
+/* ===== 主题 / 奖励故事 / 贴纸 ===== */
+/*POEM-START*/
 const POEMS=[
 {t:'咏鹅',a:'骆宾王',l:['鹅，鹅，鹅，','曲项向天歌。','白毛浮绿水，','红掌拨清波。'],e:['🦢','🎵','🌊','🦆']},
 {t:'静夜思',a:'李白',l:['床前明月光，','疑是地上霜。','举头望明月，','低头思故乡。'],e:['🛏️','❄️','🌕','🏠']},
@@ -253,27 +294,180 @@ const POEMS=[
 {t:'登鹳雀楼',a:'王之涣',l:['白日依山尽，','黄河入海流。','欲穷千里目，','更上一层楼。'],e:['🌄','🏞️','👀','🏯']},
 {t:'悯农',a:'李绅',l:['锄禾日当午，','汗滴禾下土。','谁知盘中餐，','粒粒皆辛苦。'],e:['☀️','💧','🍚','🌾']},
 {t:'画',a:'王维',l:['远看山有色，','近听水无声。','春去花还在，','人来鸟不惊。'],e:['⛰️','🌊','🌷','🐦']}];
-function poem(k){
-  const p=POEMS[k%POEMS.length];let T=[];
+/*POEM-END*/
+/*DATA-START*/
+const THEMES=[
+{id:'princess',n:'公主',i:'👸',coll:'公主魔法柜',t:['#FFC9DE','#E8D5FF'],
+ stk:[['👑','小皇冠'],['👸','小公主'],['🏰','粉色城堡'],['🪄','魔法棒'],['👗','公主裙'],['💎','闪亮钻石'],['🌹','红玫瑰'],['🦢','白天鹅'],['🎀','蝴蝶结'],['🧚','小仙女']],
+ st:[{t:'魔法城堡',s:[['👸','小公主住在粉色的城堡里。'],['🪄','她有一根会发光的魔法棒。'],['🌹','魔法棒一挥，花园里开满了玫瑰。'],['👑','大家都说，爱笑的小公主最漂亮。']]},
+     {t:'城堡舞会',s:[['👗','今天城堡有舞会，公主换上了新裙子。'],['🥿','她的小鞋子，闪闪亮。'],['💃','公主和朋友们，跳起了圆圈舞。'],['🌙','月亮出来了，大家笑着回家睡觉。']]}]},
+{id:'train',n:'蒸汽火车',i:'🚂',coll:'火车博物馆',t:['#A8E6CF','#FFE29A'],stk:null,
+ st:[{t:'小火车出发啦',s:[['🌅','清晨，小蒸汽火车呜呜呜，醒来啦。'],['🔥','司机叔叔添了煤，炉子里火红火红。'],['🌉','火车爬过高高的山，穿过长长的桥。'],['🏠','天黑以前，它把小朋友们送回了家。']]},
+     {t:'会飞的星星火车',s:[['🚂','有一列会飞的蒸汽火车，烟囱里喷出白云。'],['🌈','它沿着彩虹铁轨，飞上了月亮。'],['👽','月亮上的小外星人，也跳上了火车。'],['⭐','大家一起摘星星，咔嚓咔嚓，真开心。']]},
+     {t:'蒸汽火车怎么跑',s:[['🔥','先烧煤，把锅炉烧得热热的。'],['💧','水变成了白白的蒸汽。'],['⚙️','蒸汽推着轮子，轮子转呀转。'],['🎶','呜，呜，火车跑起来啦。']]}]},
+{id:'unicorn',n:'独角兽',i:'🦄',coll:'彩虹贴纸册',t:['#E3D1FF','#C9F1FF'],
+ stk:[['🦄','小独角兽'],['🌈','彩虹'],['☁️','白云'],['⭐','星星'],['💖','爱心'],['🍭','棒棒糖'],['🧁','小蛋糕'],['🌸','小花'],['🦋','蝴蝶'],['🍓','草莓']],
+ st:[{t:'彩虹森林',s:[['🦄','彩虹森林里，住着一只小独角兽。'],['🌈','它的角一闪，天上就出现了彩虹。'],['☁️','它踩着软软的云朵，去找朋友玩。'],['💖','大家一起笑，森林里到处是爱心。']]},
+     {t:'糖果山',s:[['🍭','小独角兽发现了一座糖果山。'],['🧁','它把蛋糕分给小兔子和小鸟。'],['⭐','分享的人，头上的星星最亮。'],['😴','吃饱啦，它在云朵床上睡着了。']]}]},
+{id:'transport',n:'交通工具',i:'🚗',coll:'交通小车库',t:['#B7DDFF','#FFE0A8'],
+ stk:[['🚗','小汽车'],['🚌','公共汽车'],['🚲','自行车'],['✈️','飞机'],['🚢','轮船'],['🚁','直升机'],['🚑','救护车'],['🚒','消防车'],['🚓','警车'],['🛴','滑板车']],
+ st:[{t:'大家出发啦',s:[['🚗','小汽车嘀嘀嘀，送爸爸去上班。'],['🚌','大巴车载着小朋友去春游。'],['🚲','自行车铃铃铃，慢慢往前骑。'],['✈️','飞机飞得最高，穿过白白的云。']]},
+     {t:'红绿灯',s:[['🚦','路口有个红绿灯，红灯停。'],['🚗','绿灯亮了，小汽车慢慢走。'],['🚑','救护车呜哇呜哇，大家让一让。'],['🛣️','大家守规则，路上真安全。']]}]},
+{id:'construction',n:'工程车',i:'🏗️',coll:'工程车车库',t:['#FFD98A','#FFC9A8'],
+ stk:[['🏗️','大吊车'],['🚜','拖拉机'],['🚛','大卡车'],['🚧','路障'],['🧱','红砖头'],['🔨','小锤子'],['🔧','扳手'],['🦺','安全背心'],['⛑️','安全帽'],['🛠️','工具箱']],
+ st:[{t:'工地真热闹',s:[['🏗️','工地上，大吊车伸长了手臂。'],['🚛','翻斗车拉来了好多沙子。'],['🚧','压路机把路面压得平平的。'],['🏠','大家一起，盖起了一座新房子。']]},
+     {t:'修一座小桥',s:[['🚜','拖拉机在田里，翻着松松的土。'],['🧱','小朋友搬来一块块红砖。'],['🔨','叔叔们叮叮当当，修好了小桥。'],['🌉','桥修好了，小朋友们开心地走过去。']]}]},
+{id:'space',n:'宇航太空',i:'🚀',coll:'太空展示舱',t:['#B9B7FF','#8FB8F0'],
+ stk:[['🚀','小火箭'],['🧑‍🚀','宇航员'],['🌍','地球'],['🌕','月亮'],['🪐','土星'],['⭐','星星'],['☄️','流星'],['👽','外星人'],['🛸','飞碟'],['🔭','望远镜']],
+ st:[{t:'飞向月亮',s:[['🚀','火箭轰隆隆，飞向了太空。'],['🌍','小宇航员看见了蓝色的地球。'],['🌕','他在月亮上，轻轻地跳呀跳。'],['⭐','他摘下一颗星星，带回给妈妈。']]},
+     {t:'外星朋友',s:[['👽','小飞船遇到了一个外星朋友。'],['🪐','他们一起绕着土星转圈圈。'],['☄️','流星划过，像一道亮亮的尾巴。'],['🏠','飞船回家啦，宇航员睡了个好觉。']]}]},
+{id:'dino',n:'恐龙',i:'🦕',coll:'恐龙化石馆',t:['#BDEBB0','#FFE1A0'],
+ stk:[['🦕','长脖子龙'],['🦖','霸王龙'],['🥚','恐龙蛋'],['🐣','小恐龙'],['🌋','火山'],['🌴','大树'],['🦴','骨头'],['🐾','脚印'],['🌿','蕨叶'],['🦎','小蜥蜴']],
+ st:[{t:'恐龙宝宝',s:[['🦕','长脖子恐龙，在树林里吃树叶。'],['🥚','草丛里，有一颗大大的恐龙蛋。'],['🐣','咔嚓一声，小恐龙出来啦。'],['💕','恐龙妈妈把它抱在怀里。']]},
+     {t:'爱笑的霸王龙',s:[['🦖','霸王龙吼吼吼，可是它很爱笑。'],['🌋','火山轰隆隆，小恐龙们赶紧躲好。'],['🌴','大家手拉手，一起走进森林。'],['😴','夜晚，恐龙们都睡着了。']]}]},
+{id:'animals',n:'小动物',i:'🐰',coll:'动物朋友墙',t:['#FFD9B8','#CFEFC4'],
+ stk:[['🐰','小兔子'],['🐻','小熊'],['🐱','小猫'],['🐶','小狗'],['🐤','小鸡'],['🦊','狐狸'],['🐼','熊猫'],['🐨','考拉'],['🦁','狮子'],['🐘','大象'],['🐸','青蛙'],['🐧','企鹅']],
+ st:[{t:'森林里的晚饭',s:[['🐰','小兔子蹦蹦跳，去找胡萝卜。'],['🐻','小熊坐在树下，吃着甜甜的蜂蜜。'],['🐿️','松鼠把松果藏在树洞里。'],['🌙','晚上，动物们都回家睡觉啦。']]},
+     {t:'好朋友',s:[['🐱','小猫咪喵喵叫，想要玩球。'],['🐶','小狗汪汪汪，陪它一起跑。'],['🐤','小鸭子嘎嘎嘎，跟在后面。'],['🤗','大家都是好朋友。']]}]}];
+/*DATA-END*/
+const curTheme=()=>THEMES.find(t=>t.id===S.theme)||THEMES[0];
+function applyTheme(){
+  const T=curTheme(),r=document.documentElement.style;
+  r.setProperty('--t1',T.t[0]);r.setProperty('--t2',T.t[1]);
+  $('#thm').textContent=`${T.i} ${T.n}`;
+}
+const pr=id=>{const d=id===S.theme?S:(ALL[id]||blank());return{n:Object.keys(d.done||{}).length,s:d.stars||0}};
+function pickTheme(first){
+  const ov=h('div','ov'),bx=h('div','card poem'),g=h('div','tgrid');
+  THEMES.forEach(T=>{
+    const b=h('button','tcard'+(T.id===S.theme?' on':''),`<span class="te">${T.i}</span>${T.n}<small style="display:block;font-size:14px;opacity:.8;margin-top:4px">已学 ${pr(T.id).n} 字 · ⭐${pr(T.id).s}</small>`);
+    b.style.background=`linear-gradient(160deg,${T.t[0]},${T.t[1]})`;
+    b.onclick=()=>{if(T.id!==S.theme){save();S.theme=T.id;loadTheme()}S.themeChosen=true;save();applyTheme();ov.remove();home()};
+    g.append(b);
+  });
+  bx.append(h('div','q','🎨 选一个喜欢的主题'),h('div','word','主题会换成对应的奖励故事和贴纸'),g);
+  if(!first){const c=h('button','btn','关闭');c.style.background='var(--sky)';c.onclick=()=>ov.remove();bx.append(c)}
+  ov.append(bx);document.body.append(ov);
+}
+function theater(o){
+  let T=[];
   const ov=h('div','ov'),bx=h('div','card poem'),st=h('div','stage');
-  const stop=()=>{T.forEach(clearTimeout);T=[];try{speechSynthesis.cancel()}catch(e){}};
+  const stop=()=>{T.forEach(clearTimeout);T=[];silence()};
   const close=()=>{stop();ov.remove()};
   function play(){
-    stop();
-    p.l.forEach((ln,i)=>T.push(setTimeout(()=>{st.innerHTML=`<div class="sc">${p.e[i]}</div><div class="han ln">${ln}</div>`;speakText(ln)},i*4500)));
-    T.push(setTimeout(()=>{st.innerHTML='<div class="sc">👏</div><div class="han ln">真棒！</div>'},p.l.length*4500));
+    stop();st.innerHTML='';
+    const at=(ms,f)=>T.push(setTimeout(f,ms));
+    at(0,()=>{st.innerHTML=`<div class="sc">${o.icon}</div><div class="han ln">《${o.title}》</div><div class="word">${o.sub||''}</div>`;speakText(o.title+(o.sub?'，'+o.sub:''),o.rate)});
+    o.scenes.forEach((sc,i)=>at(o.introGap+i*o.gap,()=>{st.innerHTML=`<div class="sc">${sc[0]}</div><div class="han ln">${sc[1]}</div>`;speakText(sc[1],o.rate)}));
+    at(o.introGap+o.scenes.length*o.gap,()=>{st.innerHTML='<div class="sc">👏</div><div class="han ln">真棒！</div>'});
   }
   const v=document.createElement('video');v.preload='auto';v.controls=true;v.playsInline=true;v.style.cssText='width:100%;max-height:50vh;border-radius:20px';
   v.onloadeddata=()=>{stop();st.innerHTML='';st.append(v);again.style.display='none'};
-  v.src=`assets/video/poem/${p.t}.mp4`;
+  v.src=o.video;
   const row=h('div','row');
   const again=h('button','btn','🔁 再看一遍');again.style.background='var(--sky)';again.onclick=play;
-  const ok=h('button','btn','继续学习');ok.style.background='var(--coral)';ok.onclick=close;
+  const ok=h('button','btn',o.nextLabel);ok.style.background='var(--coral)';ok.onclick=()=>{close();o.next&&o.next()};
   row.append(again,ok);
-  bx.append(h('div','q',`🎬 古诗小剧场：《${p.t}》`),h('div','word',p.a),st,row);
-  ov.append(bx);document.body.append(ov);beep(true);play();
+  bx.append(h('div','q',o.head),st,row);ov.append(bx);document.body.append(ov);beep(true);play();
 }
-home();conv(document.body);mo.observe(document.body,{childList:true,subtree:true,characterData:true});
+/* 每个主题配 2 首古诗, 轮流出现 (序号对应 POEMS) */
+const PO={princess:[1,2],train:[3,5],unicorn:[2,5],transport:[3,1],construction:[4,3],space:[1,3],dino:[0,5],animals:[0,2]};
+/* 每学会 12 个字 = 1 次奖励; 用 rewarded 计数, 不会因为数字跳过 12 而漏掉 */
+let RP=false;
+function checkReward(){
+  if(RP)return;
+  const n=Object.keys(S.done).length,r=S.rewarded||0;
+  if(Math.floor(n/12)<=r)return;
+  RP=true;const th=S.theme;
+  setTimeout(()=>{RP=false;if(S.theme!==th||document.querySelector('.ov'))return;S.rewarded=r+1;save();reward(r)},2000);
+}
+function addLib(k){if(!S.lib.includes(k)){S.lib.push(k);save()}}
+function poemTheater(pi,next){
+  const p=POEMS[pi];addLib('p:'+pi);
+  theater({head:'🎬 古诗小剧场',icon:'📜',title:p.t,sub:p.a,scenes:p.l.map((l,j)=>[p.e[j],l]),rate:.85,introGap:3200,gap:3300,video:`assets/video/poem/${p.t}.mp4`,nextLabel:next?next.label:'关闭',next:next&&next.fn});
+}
+function storyTheater(tid,i,nextLabel){
+  const T=THEMES.find(x=>x.id===tid),st=T.st[i];addLib(`s:${tid}:${i}`);
+  theater({head:`${T.i} ${T.n}小故事`,icon:T.i,title:st.t,sub:'',scenes:st.s,rate:.75,introGap:3000,gap:5600,video:`assets/video/${tid}/${i+1}.mp4`,nextLabel:nextLabel||'关闭'});
+}
+function reward(k){
+  const T=curTheme(),pi=(PO[T.id]||[0,1])[k%2],i=k%T.st.length;
+  addLib('p:'+pi);addLib(`s:${T.id}:${i}`); /* 解锁时两个视频都先存进视频库 */
+  poemTheater(pi,{label:`下一个：${T.n}小故事 ${T.i}`,fn:()=>storyTheater(T.id,i,'继续学习')});
+}
+/* ===== 视频库: 看过的古诗和故事都收在这里, 随时重看 ===== */
+function library(){
+  app.innerHTML='';
+  const bar=h('div','bar');const bk=h('button','back','← 首页');bk.onclick=home;bar.append(bk,h('span','q','🎞️ 我的视频库'));app.append(bar);
+  const items=S.lib.map(k=>{
+    const [t,a,b]=k.split(':');
+    if(t==='p'){const p=POEMS[+a];return p&&{e:'📜',t:p.t,s:'古诗 · '+p.a,bg:'linear-gradient(160deg,#FFE29A,#FFD9A8)',f:()=>poemTheater(+a)}}
+    const T=THEMES.find(x=>x.id===a),st=T&&T.st[+b];
+    return st&&{e:T.i,t:st.t,s:T.n+'小故事',bg:`linear-gradient(160deg,${T.t[0]},${T.t[1]})`,f:()=>storyTheater(a,+b)};
+  }).filter(Boolean);
+  if(!items.length){app.append(h('p','q','学满 12 个新字，就会解锁第一个视频 🎁'));return}
+  app.append(h('p','q',`已解锁 ${items.length} 个，点一下就能再看`));
+  const g=h('div','tgrid');
+  items.forEach(it=>{const b=h('button','tcard',`<span class="te">${it.e}</span>${it.t}<small style="display:block;font-size:15px;opacity:.8;margin-top:4px">${it.s}</small>`);b.style.background=it.bg;b.onclick=it.f;g.append(b)});
+  app.append(g);
+}
+/* ===== 贴纸收藏: 每 24 颗星, 按当前主题随机得到 1 个 ===== */
+const PAL=[['#FFB3C6','#FFD9A8','#9A7BF0'],['#A9D4FF','#FFE29A','#FF8FAE'],['#A8E6CF','#CDB4F6','#FF9F7A'],['#FFE29A','#A9D4FF','#7ED7B6'],['#CDB4F6','#FFB3C6','#6FB1FF'],['#FFD9A8','#A8E6CF','#FF8FAE']];
+const TNAMES=['噗噗号','彩虹号','星星号','云朵号','棉花糖号','月亮号','小烟囱号','泡泡号','糖果号','小蜗牛号'];
+function newTrain(){const r=n=>Math.floor(Math.random()*n);return{p:r(PAL.length),ch:r(3),d:r(3),f:r(2),n:TNAMES[r(TNAMES.length)]}}
+function trainSVG(t){
+  const [c1,c2,c3]=PAL[t.p],ink='#5B4B7A',L=`stroke="${ink}" stroke-width="2" stroke-linejoin="round"`;
+  const chim=[`<rect x="30" y="10" width="11" height="18" rx="3" fill="${c3}" ${L}/><rect x="27" y="6" width="17" height="6" rx="3" fill="${c3}" ${L}/>`,
+   `<polygon points="28,28 43,28 40,10 31,10" fill="${c3}" ${L}/><ellipse cx="35.5" cy="9" rx="9" ry="4" fill="${c3}" ${L}/>`,
+   `<rect x="32" y="12" width="9" height="16" rx="4" fill="${c3}" ${L}/><circle cx="36.5" cy="10" r="7" fill="${c2}" ${L}/>`][t.ch];
+  const deco=[`<polygon points="103,43 105,47.5 110,48 106.5,51 107.5,56 103,53.5 98.5,56 99.5,51 96,48 101,47.5" fill="#FFD166" ${L}/>`,
+   `<path d="M103 56 C94 49 97 42 103 47 C109 42 112 49 103 56Z" fill="#FF8FAE" ${L}/>`,
+   `<circle cx="96" cy="50" r="3.5" fill="#fff" ${L}/><circle cx="103" cy="50" r="3.5" fill="#FFD166" ${L}/><circle cx="110" cy="50" r="3.5" fill="#FF8FAE" ${L}/>`][t.d];
+  const mouth=t.f?`<path d="M50 46 Q55 56 60 46Z" fill="#FF8FAE" stroke="#3D3260" stroke-width="1.5" stroke-linejoin="round"/>`:`<path d="M50 47 Q55 52 60 47" stroke="#3D3260" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  const wheel=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c3}" ${L}/><circle cx="${x}" cy="${y}" r="${r/3}" fill="#fff"/>`;
+  return `<svg viewBox="0 -12 130 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${t.n}">
+<circle cx="40" cy="-3" r="5" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="49" cy="-8" r="4" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="57" cy="-4" r="3" fill="#fff" stroke="#E2D8F3" stroke-width="2"/>
+${chim}
+<rect x="20" y="26" width="64" height="28" rx="14" fill="${c1}" ${L}/>
+<circle cx="66" cy="24" r="6" fill="${c2}" ${L}/>
+<rect x="82" y="16" width="32" height="42" rx="6" fill="${c2}" ${L}/><rect x="78" y="10" width="40" height="9" rx="4" fill="${c3}" ${L}/>
+<rect x="89" y="24" width="18" height="14" rx="4" fill="#fff" ${L}/>
+${deco}
+<circle cx="45" cy="40" r="3.2" fill="#3D3260"/><circle cx="65" cy="40" r="3.2" fill="#3D3260"/><circle cx="46" cy="39" r="1" fill="#fff"/><circle cx="66" cy="39" r="1" fill="#fff"/>
+<circle cx="38" cy="46" r="3.5" fill="#FF9FB5" opacity=".6"/><circle cx="72" cy="46" r="3.5" fill="#FF9FB5" opacity=".6"/>${mouth}
+<rect x="14" y="54" width="106" height="8" rx="4" fill="${ink}"/>
+<polygon points="4,70 16,54 16,70" fill="${c3}" ${L}/>
+${wheel(104,68,12)}${wheel(50,72,8)}${wheel(70,72,8)}
+<rect x="0" y="82" width="130" height="3" rx="1.5" fill="#C9B8E6"/></svg>`;
+}
+
+const artOf=it=>it.tr?trainSVG(it.tr):`<div class="stk" style="transform:rotate(${it.r||0}deg)">${it.e}</div>`;
+const totalColl=()=>Object.values(S.coll).reduce((a,b)=>a+b.length,0);
+function giveSticker(){
+  if(totalColl()>=Math.floor(S.stars/24))return;
+  const T=curTheme(),list=S.coll[T.id]=S.coll[T.id]||[];let it;
+  if(!T.stk){const t=newTrain();it={tr:t,n:t.n}}
+  else{
+    const own=new Set(list.map(x=>x.e)),pool=T.stk.filter(x=>!own.has(x[0])),src=pool.length?pool:T.stk,p=src[Math.floor(Math.random()*src.length)];
+    it={e:p[0],n:p[1],r:Math.floor(Math.random()*13)-6};
+  }
+  list.push(it);save();beep(true);
+  const ov=h('div','ov'),bx=h('div','card poem');
+  const ok=h('button','btn','放进收藏柜 '+T.i);ok.style.background='var(--coral)';ok.onclick=()=>{ov.remove();museum()};
+  bx.append(h('div','q','🎉 得到新贴纸啦！'),h('div','tbig',artOf(it)),h('div','q',it.n),ok);
+  ov.append(bx);document.body.append(ov);setTimeout(()=>speakText(it.n),500);
+}
+function museum(){
+  const T=curTheme(),list=S.coll[T.id]||[];
+  app.innerHTML='';
+  const bar=h('div','bar');const bk=h('button','back','← 首页');bk.onclick=home;bar.append(bk,h('span','q',`${T.i} 我的${T.coll}`));app.append(bar);
+  app.append(h('p','q',`已收集 ${list.length} 个 · 再得 ${24-S.stars%24} 颗星，就有新贴纸`));
+  const cab=h('div','cab'),slots=Math.max(6,Math.ceil((list.length+1)/3)*3);
+  for(let i=0;i<slots;i++){const it=list[i];cab.append(it?h('div','shelf',artOf(it)+`<span>${it.n}</span>`):h('div','shelf empty','❔'))}
+  app.append(cab);giveSticker();
+}
+
+applyTheme();$('#thm').onclick=()=>pickTheme(false);home();conv(document.body);if(!S.themeChosen)pickTheme(true);mo.observe(document.body,{childList:true,subtree:true,characterData:true});
 </script>
 </body>
 </html>
