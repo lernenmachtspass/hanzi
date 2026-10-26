@@ -164,14 +164,19 @@ function home(){
   g.append(a,b,tr,lb);app.append(g);
   const n=Object.keys(S.done).length;
   app.append(h('p','q',`已经认识 <b>${n}</b> / ${CHARS.length} 个字`));
+  const doneLevels=LV.filter(l=>l.every(c=>S.done[c])).length;
+  app.append(h('p','q',`已完成 <b>${doneLevels}</b> / ${LV.length} 关`));
 }
 
 /* ===== 学习 ===== */
 function learn(lv){
   app.innerHTML='';
   const bar=h('div','bar');const bk=h('button','back','← 首页');bk.onclick=home;
-  const tabs=h('div','tabs');LV.forEach((_,i)=>{const t=h('button','tab',`第${i+1}关`);t.setAttribute('aria-pressed',i===lv);t.onclick=()=>learn(i);tabs.append(t)});
-  bar.append(bk,tabs);app.append(bar);
+  const tabs=h('div','tabs');LV.forEach((_,i)=>{
+  const full=LV[i].every(c=>S.done[c]);
+  const t=h('button','tab'+(full?' done':''),`第${i+1}关${full?' ✓':''}`);
+  t.setAttribute('aria-pressed',i===lv);t.onclick=()=>learn(i);tabs.append(t);
+});
   const gr=h('div','grid');
   LV[lv].forEach((c,i)=>{const b=h('button','cell han'+(S.done[c]?' done':''),c+(P[c]?`<i>${P[c][0]}</i>`:''));b.onclick=()=>showCard(lv,i);gr.append(b)});
   app.append(gr);
@@ -544,7 +549,9 @@ function poemTheater(pi,next){
 function storyTheater(tid,si,nextLabel){
   const T=THEMES.find(x=>x.id===tid),{b}=storyFor(tid,si*3),sc=storyScenes(b,T.i);
   addLib(`s:${tid}:${si}`);
-  theater({head:`${T.i} ${T.n}小故事`,icon:T.i,title:b[0],sub:'',scenes:sc,highlight:true,rate:.6,nextLabel:nextLabel||'关闭',next:nextLabel&&nextLabel.fn});
+  theater({head:`${T.i} ${T.n}小故事`,icon:T.i,title:b[0],sub:'',scenes:sc,highlight:true,storyLevel:si*3,rate:.65,
+    nextLabel:(nextLabel&&nextLabel.label)||'关闭',
+    next:nextLabel&&nextLabel.fn});
 }
 function library(){
   app.innerHTML='';
