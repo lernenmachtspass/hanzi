@@ -64,7 +64,6 @@ img.em{height:1em;width:1em;vertical-align:-.14em;display:inline-block;pointer-e
 .story-line{line-height:1.8;max-width:100%;overflow-wrap:anywhere}
 .story-known{color:#3478C8;font-weight:700}
 .story-new{display:inline-block;color:#E44878;font-size:1.42em;font-weight:900;line-height:1.2;text-shadow:0 2px 0 #FFE0EA;margin:0 1px;transform:translateY(1px)}
-
 .cab{background:linear-gradient(160deg,#fff,#F7EFE8);border:8px solid #D4A574;border-radius:24px;padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;box-shadow:var(--shadow),inset 0 0 0 3px #F0D9BD}
 .shelf{display:grid;place-items:center;gap:2px;padding:10px 6px 4px;border-bottom:10px solid #D4A574;background:linear-gradient(160deg,rgba(169,212,255,.25),rgba(255,255,255,.1));border-radius:10px 10px 0 0;min-height:132px;color:#3D3260;text-align:center;font-size:16px}
 .shelf svg{width:100%;max-width:150px;height:auto}
@@ -146,10 +145,10 @@ function tts(w,rate,onend){
 try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
 let AC;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const n=ok?[660,880,1100]:[220];n.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.type='triangle';g.gain.value=.15;o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.1);o.stop(AC.currentTime+i*.1+.15)})}catch(e){}}
 
-/* ===== 图片/视频 ===== */
+/* ===== 图片 ===== */
 function media(c){
   const box=h('div','pic');
-  const emo=()=>{box.innerHTML=P[c]?P[c][0]:`<span class="han" style="font-size:min(20vw,110px)">${c}</span>`;if(P[c]&&P[c][0].length>2)box.style.fontSize='min(8vw,44px)'};
+  const emo=()=>{box.innerHTML=P[c]?P[c][0]:`<span class="han" style="font-size:min(20vw,110px)">${c}</span>`};
   const img=new Image();img.alt=c;img.onload=()=>{box.innerHTML='';box.append(img)};img.onerror=emo;img.src=`assets/img/${c}.png`;emo();
   return box;
 }
@@ -165,7 +164,6 @@ function home(){
   g.append(a,b,tr,lb);app.append(g);
   const n=Object.keys(S.done).length;
   app.append(h('p','q',`已经认识 <b>${n}</b> / ${CHARS.length} 个字`));
-  checkReward();
 }
 
 /* ===== 学习 ===== */
@@ -180,7 +178,7 @@ function learn(lv){
 }
 let writer;
 function showCard(lv,i){
-  const list=LV[lv],c=list[i];S.done[c]=1;save();say(c);checkReward();
+  const list=LV[lv],c=list[i];S.done[c]=1;save();say(c);
   app.innerHTML='';
   const bar=h('div','bar');const bk=h('button','back','← 返回');bk.onclick=()=>learn(lv);bar.append(bk,h('span','q',`${i+1} / ${list.length}`));app.append(bar);
   const card=h('div','card');
@@ -195,7 +193,11 @@ function showCard(lv,i){
   mk('▶️ 笔顺','var(--plum)',()=>{try{writer.cancelQuiz()}catch(e){}tip.textContent='看一看，笔画是这样写的';anim()});
   mk('🖍️ 描红','var(--leaf)',()=>trace());
   if(i>0)mk('⬅️','var(--leaf)',()=>card_(lv,i-1));
-  mk(i<list.length-1?'下一个 ➡️':'🎉 完成','var(--coral)',()=>i<list.length-1?card_(lv,i+1):(beep(true),learn(lv)));
+  mk(i<list.length-1?'下一个 ➡️':'🎉 完成本关','var(--coral)',()=>{
+    if(i<list.length-1)return card_(lv,i+1);
+    // 完成整关：解锁古诗（每关1首）；若本关是第3/6/9…关，额外解锁故事
+    beep(true);unlockAndPlay(lv);
+  });
   card.append(r);app.append(card);
   function anim(){try{writer.animateCharacter()}catch(e){}}
   function trace(){try{
@@ -205,6 +207,21 @@ function showCard(lv,i){
   }catch(e){}}
   try{writer=HanziWriter.create('writer',c,{width:220,height:220,padding:16,strokeColor:'#FF7FA0',radicalColor:'#7FB6F5',strokeAnimationSpeed:.5,delayBetweenStrokes:600,showOutline:true,outlineColor:'#E3CFD9',drawingWidth:18,drawingColor:'#FF7FA0',highlightColor:'#7ED7B6',onLoadCharDataError:()=>{w.style.display='none'}});anim()}catch(e){w.style.display='none'}
   function card_(a,b){showCard(a,b)}
+}
+
+/* ===== 关末解锁：每关古诗；每3关故事 ===== */
+function unlockAndPlay(level){
+  const T=curTheme();
+  const pi=lessonPoem(T.id,level);
+  addLib('p:'+pi);
+  const isStoryLevel=(level+1)%3===0; // 第3、6、9…关
+  let si=null;
+  if(isStoryLevel){si=Math.min(Math.floor(level/3),29);addLib(`s:${T.id}:${si}`);}
+  const after=()=>{
+    if(si!=null)storyTheater(T.id,si,()=>learn(level));
+    else learn(level);
+  };
+  poemTheater(pi,si!=null?{label:`${T.n}小故事`,fn:()=>storyTheater(T.id,si,()=>learn(level))}:{label:'回学习',fn:()=>learn(level)});
 }
 
 /* ===== 测试 ===== */
@@ -241,7 +258,7 @@ function quiz(mode){
     const o=h('div','opts');
     opts.forEach(x=>{const b=h('button','opt han',x);b.onclick=()=>{
       if(card.dataset.lock)return;
-      if(x===c){card.dataset.lock=1;b.classList.add('ok');beep(true);right++;S.stars++;S.done[c]=1;save();say(c);setTimeout(()=>{n++;next()},1900)}
+      if(x===c){card.dataset.lock=1;b.classList.add('ok');beep(true);right++;S.stars++;save();say(c);setTimeout(()=>{n++;next()},1900)}
       else{b.classList.add('no');beep(false)}}
       o.append(b)});
     card.append(o);app.append(card);
@@ -307,63 +324,10 @@ const POEMS=[
 {t:'小儿垂钓',a:'胡令能',l:['蓬头稚子学垂纶，','侧坐莓苔草映身。','路人借问遥招手，','怕得鱼惊不应人。'],e:['🧒','🎣','👋','🐟']},
 {t:'江南',a:'汉乐府',l:['江南可采莲，','莲叶何田田。','鱼戏莲叶间，','鱼戏莲叶东。'],e:['🪷','🍃','🐟','🌊']},
 {t:'风',a:'李峤',l:['解落三秋叶，','能开二月花。','过江千尺浪，','入竹万竿斜。'],e:['🍂','🌸','🌊','🎋']},
-{t:'鹿柴',a:'王维',l:['空山不见人，','但闻人语响。','返景入深林，','复照青苔上。'],e:['🌳','👂','🌅','🌿']},
-{t:"悯农其一",a:"李绅",l:["春种一粒粟，","秋收万颗子。","四海无闲田，","农夫犹饿死。"],e:['🌾','👨‍🌾','☀️','😢']},
-{t:"回乡偶书其二",a:"贺知章",l:["离别家乡岁月多，","近来人事半消磨。","惟有门前镜湖水，","春风不改旧时波。"],e:['🏠','🍂','🌙','💧']},
-{t:"凉州词",a:"王之涣",l:["黄河远上白云间，","一片孤城万仞山。","羌笛何须怨杨柳，","春风不度玉门关。"],e:['🏜️','🏯','🐎','🌙']},
-{t:"凉州词其一",a:"王翰",l:["葡萄美酒夜光杯，","欲饮琵琶马上催。","醉卧沙场君莫笑，","古来征战几人回。"],e:['🍷','🎸','⚔️','🌙']},
-{t:"出塞",a:"王昌龄",l:["秦时明月汉时关，","万里长征人未还。","但使龙城飞将在，","不教胡马度阴山。"],e:['🌙','🏯','🐎','⛰️']},
-{t:"芙蓉楼送辛渐",a:"王昌龄",l:["寒雨连江夜入吴，","平明送客楚山孤。","洛阳亲友如相问，","一片冰心在玉壶。"],e:['🌧️','🕊️','💌','🫙']},
-{t:"从军行",a:"王昌龄",l:["青海长云暗雪山，","孤城遥望玉门关。","黄沙百战穿金甲，","不破楼兰终不还。"],e:['🏔️','🏯','⚔️','🔥']},
-{t:"别董大",a:"高适",l:["千里黄云白日曛，","北风吹雁雪纷纷。","莫愁前路无知己，","天下谁人不识君。"],e:['☁️','🦢','❄️','💪']},
-{t:"早春呈水部张十八员外",a:"韩愈",l:["天街小雨润如酥，","草色遥看近却无。","最是一年春好处，","绝胜烟柳满皇都。"],e:['🌧️','🌱','🌸','🌿']},
-{t:"晚春",a:"韩愈",l:["草树知春不久归，","百般红紫斗芳菲。","杨花榆荚无才思，","惟解漫天作雪飞。"],e:['🌿','🌸','🌬️','❄️']},
-{t:"竹枝词",a:"刘禹锡",l:["杨柳青青江水平，","闻郎江上唱歌声。","东边日出西边雨，","道是无晴却有晴。"],e:['🌿','🎵','🌦️','💕']},
-{t:"乌衣巷",a:"刘禹锡",l:["朱雀桥边野草花，","乌衣巷口夕阳斜。","旧时王谢堂前燕，","飞入寻常百姓家。"],e:['🌿','🌇','🐦','🏠']},
-{t:"望洞庭",a:"刘禹锡",l:["湖光秋月两相和，","潭面无风镜未磨。","遥望洞庭山水翠，","白银盘里一青螺。"],e:['🌊','🌙','⛰️','🥏']},
-{t:"浪淘沙",a:"刘禹锡",l:["九曲黄河万里沙，","浪淘风簸自天涯。","如今直上银河去，","同到牵牛织女家。"],e:['🌊','💨','🌌','⭐']},
-{t:"赋得古原草送别其一",a:"白居易",l:["离离原上草，","一岁一枯荣。","野火烧不尽，","春风吹又生。"],e:['🌿','🍂','🔥','🌱']},
-{t:"小重山",a:"章良能",l:["柳暗花明春事深。","小阑红芍药，已抽簪。","雨馀风软碎鸣禽。","迟迟日，犹带一分阴。","往事莫沉吟。","身闲时序好，且登临。","旧游无处不堪寻。","无寻处，惟有少年心。"],e:['🌿','🌺','🐦','☀️','💭','⛰️','🍃','💔']},
-{t:"忆江南",a:"白居易",l:["江南好，","风景旧曾谙。","日出江花红胜火，","春来江水绿如蓝。"],e:['🌊','🌸','🌅','💚']},
-{t:"问刘十九",a:"白居易",l:["绿蚁新醅酒，","红泥小火炉。","晚来天欲雪，","能饮一杯无？"],e:['🍶','🔥','❄️','🍻']},
-{t:"暮江吟",a:"白居易",l:["一道残阳铺水中，","半江瑟瑟半江红。","可怜九月初三夜，","露似真珠月似弓。"],e:['🌇','🌊','🌙','💧']},
-{t:"大林寺桃花",a:"白居易",l:["人间四月芳菲尽，","山寺桃花始盛开。","长恨春归无觅处，","不知转入此中来。"],e:['🌸','🏯','🍃','✨']},
-{t:"题李凝幽居",a:"贾岛",l:["闲居少邻并，","草径入荒园。","鸟宿池边树，","僧敲月下门。"],e:['🏡','🌿','🐦','🌙']},
-{t:"寻陆鸿渐不遇",a:"皎然",l:["移家虽带郭，","野径入桑麻。","近种篱边菊，","秋来未著花。"],e:['🏠','🌾','🌼','🍂']},
-{t:"题都城南庄",a:"崔护",l:["去年今日此门中，","人面桃花相映红。","人面不知何处去，","桃花依旧笑春风。"],e:['🚪','🌸','💭','🌬️']},
-{t:"寒食",a:"韩翃",l:["春城无处不飞花，","寒食东风御柳斜。","日暮汉宫传蜡烛，","轻烟散入五侯家。"],e:['🌸','🌿','🕯️','🏛️']},
-{t:"逢雪宿芙蓉山主人",a:"刘长卿",l:["日暮苍山远，","天寒白屋贫。","柴门闻犬吠，","风雪夜归人。"],e:['🌇','🏔️','🐕','❄️']},
-{t:"送灵澈上人",a:"刘长卿",l:["苍苍竹林寺，","杳杳钟声晚。","荷笠带斜阳，","青山独归远。"],e:['🎋','🔔','🌇','⛰️']},
-{t:"秋夜寄邱员外",a:"韦应物",l:["怀君属秋夜，","散步咏凉天。","空山松子落，","幽人应未眠。"],e:['🍂','🌙','🌲','💭']},
-{t:"滁州西涧",a:"韦应物",l:["独怜幽草涧边生，","上有黄鹂深树鸣。","春潮带雨晚来急，","野渡无人舟自横。"],e:['🌿','🐦','🌧️','🛶']},
-{t:"塞下曲",a:"卢纶",l:["月黑雁飞高，","单于夜遁逃。","欲将轻骑逐，","大雪满弓刀。"],e:['🌑','🦢','🐎','❄️']},
-{t:"塞下曲其二",a:"卢纶",l:["林暗草惊风，","将军夜引弓。","平明寻白羽，","没在石棱中。"],e:['🌲','🏹','🌅','🪨']},
-{t:"江畔独步寻花",a:"杜甫",l:["黄四娘家花满蹊，","千朵万朵压枝低。","留连戏蝶时时舞，","自在娇莺恰恰啼。"],e:['🌸','🌺','🦋','🐦']},
-{t:"绝句其二",a:"杜甫",l:["迟日江山丽，","春风花草香。","泥融飞燕子，","沙暖睡鸳鸯。"],e:['☀️','🌸','🐦','🦆']},
-{t:"闻官军收河南河北",a:"杜甫",l:["剑外忽传收蓟北，","初闻涕泪满衣裳。","却看妻子愁何在，","漫卷诗书喜欲狂。"],e:['📜','😭','👨‍👩‍👧','🎉']},
-{t:"登高",a:"杜甫",l:["风急天高猿啸哀，","渚清沙白鸟飞回。","无边落木萧萧下，","不尽长江滚滚来。"],e:['💨','🐒','🍂','🌊']},
-{t:"望岳",a:"杜甫",l:["岱宗夫如何？","齐鲁青未了。","造化钟神秀，","阴阳割昏晓。"],e:['⛰️','🌿','✨','🌗']},
-{t:"春望",a:"杜甫",l:["国破山河在，","城春草木深。","感时花溅泪，","恨别鸟惊心。"],e:['🏯','🌿','🌸','😢']},
-{t:"题西林壁",a:"苏轼",l:["横看成岭侧成峰，","远近高低各不同。","不识庐山真面目，","只缘身在此山中。"],e:['⛰️','👁️','🌫️','💡']},
-{t:"惠崇春江晚景",a:"苏轼",l:["竹外桃花三两枝，","春江水暖鸭先知。","蒌蒿满地芦芽短，","正是河豚欲上时。"],e:['🎋','🌸','🦆','🐟']},
-{t:"饮湖上初晴后雨",a:"苏轼",l:["水光潋滟晴方好，","山色空蒙雨亦奇。","欲把西湖比西子，","淡妆浓抹总相宜。"],e:['🌊','☀️','🌧️','💄']},
-{t:"六月二十七日望湖楼醉书",a:"苏轼",l:["黑云翻墨未遮山，","白雨跳珠乱入船。","卷地风来忽吹散，","望湖楼下水如天。"],e:['☁️','🌧️','💨','🌊']},
-{t:"赠刘景文",a:"苏轼",l:["荷尽已无擎雨盖，","菊残犹有傲霜枝。","一年好景君须记，","最是橙黄橘绿时。"],e:['🪷','🌼','🍊','🍂']},
-{t:"夏日绝句",a:"李清照",l:["生当作人杰，","死亦为鬼雄。","至今思项羽，","不肯过江东。"],e:['💪','⚔️','🏛️','🌊']},
-{t:"如梦令",a:"李清照",l:["常记溪亭日暮，","沉醉不知归路。","兴尽晚回舟，","误入藕花深处。"],e:['🌇','🍶','🛶','🪷']},
-{t:"示儿",a:"陆游",l:["死去元知万事空，","但悲不见九州同。","王师北定中原日，","家祭无忘告乃翁。"],e:['📜','😢','🇨🇳','🕯️']},
-{t:"游山西村",a:"陆游",l:["莫笑农家腊酒浑，","丰年留客足鸡豚。","山重水复疑无路，","柳暗花明又一村。"],e:['🍶','🐖','⛰️','🌿']},
-{t:"游园不值",a:"叶绍翁",l:["应怜屐齿印苍苔，","小扣柴扉久不开。","春色满园关不住，","一枝红杏出墙来。"],e:['🌿','🚪','🌸','🌺']},
-{t:"乡村四月",a:"翁卷",l:["绿遍山原白满川，","子规声里雨如烟。","乡村四月闲人少，","才了蚕桑又插田。"],e:['🌿','🐦','🌧️','🌾']},
-{t:"四时田园杂兴",a:"范成大",l:["昼出耘田夜绩麻，","村庄儿女各当家。","童孙未解供耕织，","也傍桑阴学种瓜。"],e:['☀️','🏡','🧒','🍈']},
-{t:"四时田园杂兴其二",a:"范成大",l:["梅子金黄杏子肥，","麦花雪白菜花稀。","日长篱落无人过，","惟有蜻蜓蛱蝶飞。"],e:['🍑','🌾','☀️','🦋']},
-{t:"宿新市徐公店",a:"杨万里",l:["篱落疏疏一径深，","树头新绿未成阴。","儿童急走追黄蝶，","飞入菜花无处寻。"],e:['🌿','🌳','🧒','🦋']},
-{t:"晓出净慈寺送林子方",a:"杨万里",l:["毕竟西湖六月中，","风光不与四时同。","接天莲叶无穷碧，","映日荷花别样红。"],e:['🌊','☀️','🪷','🌺']},
-{t:"舟过安仁",a:"杨万里",l:["一叶渔船两小童，","收篙停棹坐船中。","怪生无雨都张伞，","不是遮头是使风。"],e:['🛶','🧒','☂️','💨']},
-{t:"村晚",a:"雷震",l:["草满池塘水满陂，","山衔落日浸寒漪。","牧童归去横牛背，","短笛无腔信口吹。"],e:['🌿','🌇','🐄','🎵']}
+{t:'鹿柴',a:'王维',l:['空山不见人，','但闻人语响。','返景入深林，','复照青苔上。'],e:['🌳','👂','🌅','🌿']}
 ];
 
-/* ===== 主题 / 故事 ===== */
+/* ===== 主题 ===== */
 const THEMES=[
 {id:'princess',n:'公主',i:'👸',coll:'公主魔法柜',t:['#FFC9DE','#E8D5FF'],
  stk:[['👑','小皇冠'],['👸','小公主'],['🏰','粉色城堡'],['🪄','魔法棒'],['👗','公主裙'],['💎','闪亮钻石'],['🌹','红玫瑰'],['🦢','白天鹅'],['🎀','蝴蝶结'],['🧚','小仙女']]},
@@ -381,9 +345,7 @@ const THEMES=[
 {id:'animals',n:'小动物',i:'🐰',coll:'动物朋友墙',t:['#FFD9B8','#CFEFC4'],
  stk:[['🐰','小兔子'],['🐻','小熊'],['🐱','小猫'],['🐶','小狗'],['🐤','小鸡'],['🦊','狐狸'],['🐼','熊猫'],['🐨','考拉'],['🦁','狮子'],['🐘','大象'],['🐸','青蛙'],['🐧','企鹅']]}];
 
-/* STORY_BOOK: 每主题 30 篇，对应第 1~90 关（每 3 关共用 1 篇）。
-   每篇 4 幕：[emoji, 一句]，自然用到这 3 关里的一部分字，不要求全覆盖。
-   格式：['标题','第1句','第2句','第3句','第4句'] */
+/* STORY_BOOK：每主题先 6 篇（覆盖第1~18关），后续按批补到 30 篇 */
 const STORY_BOOK={
 princess:[
  ['魔法书的第一页','公主翻开魔法书，第一页写着三个字。','她一个一个读出来，书页亮起柔和的光。','小精灵从书里飞出来，向她问好。','公主笑着合上书，约好明天再读。'],
@@ -392,7 +354,6 @@ princess:[
  ['星星灯上的字','夜里，公主把今天学的字写在星星灯上。','灯光一闪一闪，像在跟她说话。','她轻轻念一遍，就安心睡着了。','梦里，星星排成了她学的字。'],
  ['送给朋友的字','公主把学过的字做成小卡片。','她把卡片送给城堡里的每个朋友。','朋友们开心地读出卡片上的字。','大家一起把卡片贴满了墙壁。'],
  ['雨后的彩虹字','一场小雨后，天上出现彩虹。','公主发现彩虹上好像有字。','她踮起脚，一个一个认出来。','太阳出来后，彩虹慢慢消失了。'],
- // 第 7~30 篇按同一格式继续追加
 ],
 train:[
  ['小火车出发啦','清晨，小蒸汽火车呜呜地醒来。','司机叔叔添了煤，炉子火红火红。','火车爬过高山，穿过长桥。','天黑前，它把小朋友送回了家。'],
@@ -401,7 +362,6 @@ train:[
  ['雨天的旅程','天空下起大雨，铁轨湿漉漉。','火车减慢速度，仔细看信号灯。','它停在车站，等雨小一点。','乘客平安到家，都谢谢认真的司机。'],
  ['帮助小车站','小车站的钟停住了。','司机和站长一起检查齿轮。','小朋友递来工具，钟又滴答走了。','列车准时出发，大家挥手告别。'],
  ['星星货运','火车接到运送星星灯的任务。','工人把灯箱稳稳放好。','夜色里，车厢亮起温柔的光。','小镇的广场变成了星星海洋。'],
- // 第 7~30 篇继续
 ],
 unicorn:[
  ['彩虹森林','彩虹森林里，住着一只小独角兽。','它的角一闪，天上就出现彩虹。','它踩着软软的云朵，去找朋友玩。','大家一起笑，森林里到处是爱心。'],
@@ -453,7 +413,7 @@ animals:[
 ]
 };
 
-/* 每 3 关共用 1 篇故事；不足 30 篇时回落到已有故事循环 */
+/* 每 3 关共用 1 篇故事；不足时回落最后一篇 */
 function storyFor(themeId,level){
   const arr=STORY_BOOK[themeId]||STORY_BOOK.animals;
   const idx=Math.min(Math.floor(level/3),arr.length-1);
@@ -462,7 +422,6 @@ function storyFor(themeId,level){
 function storyScenes(b,themeEmoji){
   return [[themeEmoji,b[1]],[themeEmoji,b[2]],[themeEmoji,b[3]],[themeEmoji,b[4]]];
 }
-
 const curTheme=()=>THEMES.find(t=>t.id===S.theme)||THEMES[0];
 function applyTheme(){
   const T=curTheme(),r=document.documentElement.style;
@@ -523,30 +482,15 @@ function theater(o){
 }
 const PO={princess:0,train:1,unicorn:2,transport:3,construction:4,space:5,dino:6,animals:7};
 function lessonPoem(themeId,level){return (level+(PO[themeId]||0))%POEMS.length;}
-let RP=false;
-function checkReward(){
-  if(RP)return;
-  const doneStories=Math.min(Math.floor(Object.keys(S.done).length/12),LV.length); // 简化为按已学关数
-  const completed=LV.filter(level=>level.every(c=>S.done[c])).length;
-  const target=Math.floor(completed/3); // 每 3 关 1 次奖励
-  if(target<=(S.rewarded||0))return;
-  RP=true;const th=S.theme;
-  setTimeout(()=>{RP=false;if(S.theme!==th||document.querySelector('.ov'))return;S.rewarded=target;save();reward(completed-1)},900);
-}
 function addLib(k){if(!S.lib.includes(k)){S.lib.push(k);save()}}
 function poemTheater(pi,next){
   const p=POEMS[pi];addLib('p:'+pi);
-  theater({head:'🎬 古诗小剧场',icon:'📜',title:p.t,sub:p.a,scenes:p.l.map((l,j)=>[p.e[j],l]),rate:.85,video:`assets/video/poem/${p.t}.mp4`,nextLabel:next?next.label:'关闭',next:next&&next.fn});
+  theater({head:'🎬 古诗小剧场',icon:'📜',title:p.t,sub:p.a,scenes:p.l.map((l,j)=>[p.e[j],l]),rate:.85,nextLabel:next?next.label:'关闭',next:next&&next.fn});
 }
 function storyTheater(tid,si,nextLabel){
   const T=THEMES.find(x=>x.id===tid),{b}=storyFor(tid,si*3),sc=storyScenes(b,T.i);
   addLib(`s:${tid}:${si}`);
-  theater({head:`${T.i} ${T.n}小故事`,icon:T.i,title:b[0],sub:'',scenes:sc,highlight:true,rate:.75,nextLabel:nextLabel||'关闭'});
-}
-function reward(level){
-  const T=curTheme(),pi=lessonPoem(T.id,level),si=Math.min(Math.floor(level/3),29);
-  addLib('p:'+pi);addLib(`s:${T.id}:${si}`);
-  poemTheater(pi,{label:`下一个：${T.n}小故事`,fn:()=>storyTheater(T.id,si,'继续学习')});
+  theater({head:`${T.i} ${T.n}小故事`,icon:T.i,title:b[0],sub:'',scenes:sc,highlight:true,rate:.75,nextLabel:nextLabel||'关闭',next:nextLabel&&nextLabel.fn});
 }
 function library(){
   app.innerHTML='';
@@ -558,7 +502,7 @@ function library(){
     const {b:bb}=storyFor(a,(+b)*3);
     return {e:T.i,t:bb[0],s:T.n+'小故事',bg:`linear-gradient(160deg,${T.t[0]},${T.t[1]})`,f:()=>storyTheater(a,+b)};
   }).filter(Boolean);
-  if(!items.length){app.append(h('p','q','学满 3 关，就会解锁第一个故事 🎁'));return}
+  if(!items.length){app.append(h('p','q','完成一关，就会解锁一首古诗 🎁'));return}
   app.append(h('p','q',`已解锁 ${items.length} 个，点一下就能再看`));
   const g=h('div','tgrid');
   items.forEach(it=>{const b=h('button','tcard',`<span class="te">${it.e}</span>${it.t}<small style="display:block;font-size:15px;opacity:.8;margin-top:4px">${it.s}</small>`);b.style.background=it.bg;b.onclick=it.f;g.append(b)});
