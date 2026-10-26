@@ -186,31 +186,7 @@ function bestVoice(){
   const sc=v=>/natural|neural|online/i.test(v.name)?5:/premium|enhanced|siri|xiaoxiao|xiaoyi|yunxi/i.test(v.name)?4:/google/i.test(v.name)?3:/tingting|meijia|huihui|female|女/i.test(v.name)?2:1;
   return vs.sort((x,y)=>sc(y)-sc(x))[0];
 }
-/* 优先 Edge TTS（在线神经网络语音），失败回退浏览器语音 */
-async function tts(w,rate,onend){
-  const text=String(w||'');
-  if(!text.trim()){onend&&onend();return}
-  try{
-    const voice='zh-CN-XiaoxiaoNeural';            // 温柔女声，适合儿童
-    const speed=Math.round((rate||.65)*100);       // .6 → 60%
-    const cid=(crypto.randomUUID?crypto.randomUUID():(''+Date.now()+Math.random()).replace(/\./g,''));
-    const url=`https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=${cid}`;
-    const ssml=`<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='zh-CN'><voice name='${voice}'><prosody rate='${speed}%'>${text.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</prosody></voice></speak>`;
-    const resp=await fetch(url,{method:'POST',headers:{'Content-Type':'application/ssml+xml','X-Microsoft-OutputFormat':'audio-24khz-48kbitrate-mono-mp3'},body:ssml});
-    if(!resp.ok)throw new Error('edge tts');
-    const blob=await resp.blob();
-    const au=URL.createObjectURL(blob);
-    const a=new Audio(au);CUR=a;
-    a.onended=()=>{URL.revokeObjectURL(au);onend&&onend()};
-    a.onerror=()=>{URL.revokeObjectURL(au);fallbackTTS(text,rate,onend)};
-    await a.play();
-    return;
-  }catch(e){}
-  fallbackTTS(text,rate,onend);
-}
-
-/* 浏览器自带语音（原 tts 逻辑） */
-function fallbackTTS(w,rate,onend){
+function tts(w,rate,onend){
   try{
     const u=new SpeechSynthesisUtterance(w);u.lang='zh-CN';
     const v=bestVoice();if(v)u.voice=v;
@@ -219,6 +195,8 @@ function fallbackTTS(w,rate,onend){
     u.onend=finish;u.onerror=finish;speechSynthesis.speak(u);
   }catch(e){if(typeof onend==='function')onend()}
 }
+try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}
+let AC;function beep(ok){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();const n=ok?[660,880,1100]:[220];n.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.type='triangle';g.gain.value=.15;o.connect(g);g.connect(AC.destination);o.start(AC.currentTime+i*.1);o.stop(AC.currentTime+i*.1+.15)})}catch(e){}}
 
 /* ===== 图片 ===== */
 function media(c){
@@ -311,258 +289,53 @@ function unlockAndPlay(level){
   }
 }
 
-
-/* ===== 测试：修复自动切题、语音反馈和重复触发 ===== */
-let quizRunId = 0;
-
-function testMenu() {
-  quizRunId++; // 让之前的题目回调失效
-  silence();
-
-  app.innerHTML = '';
-  const bar = h('div', 'bar');
-  const bk = h('button', 'back', '← 首页');
-  bk.onclick = home;
-  bar.append(bk);
-  app.append(bar);
-
-  const g = h('div', 'home');
-  const mk = (e, t, s, col, f) => {
-    const b = h('button', 'big',
-      `<span class="e">${e}</span>${t}<small>${s}</small>`);
-    b.style.background = col;
-    b.onclick = f;
-    g.append(b);
-  };
-
-  mk('🖼️', '看图找字', '看图片，找汉字',
-    'var(--leaf)', () => quiz('pic'));
-
-  mk('👂', '听音找字', '听声音，找汉字',
-    'var(--plum)', () => quiz('ear'));
-
-  app.append(
-    g,
-    h('p', 'q',
-      `从学过的 ${CHARS.filter(c => S.done[c]).length} 个字里随机抽，最多 15 题`)
-  );
+/* ===== 测试 ===== */
+function testMenu(){
+  app.innerHTML='';
+  const bar=h('div','bar');const bk=h('button','back','← 首页');bk.onclick=home;bar.append(bk);app.append(bar);
+  const g=h('div','home');
+  const mk=(e,t,s,col,f)=>{const b=h('button','big',`<span class="e">${e}</span>${t}<small>${s}</small>`);b.style.background=col;b.onclick=f;g.append(b)};
+  mk('🖼️','看图找字','小图片，找汉字','var(--leaf)',()=>quiz('pic'));
+  mk('👂','听音找字','听声音，找汉字','var(--plum)',()=>quiz('ear'));
+  app.append(g,h('p','q',`从学过的 ${CHARS.filter(c=>S.done[c]).length} 个字里随机抽，最多 15 题`));
 }
-
-function quiz(mode) {
-  const runId = ++quizRunId;
-
-  silence();
-
-  const learned = CHARS.filter(c => S.done[c]);
-  const pool = mode === 'pic'
-    ? learned.filter(c => P[c])
-    : learned;
-
-  const base = mode === 'pic' ? PIC : CHARS;
-
-  if (!pool.length) {
-    app.innerHTML = '';
-
-    const m = h('div', 'card result',
-      `<div class="e">📚</div>
-       <div class="q">${
-         mode === 'pic'
-           ? '学过的字里还没有带图的字'
-           : '还没有学过的字'
-       }，先去学习吧！</div>`);
-
-    const b = h('button', 'btn', '去学习');
-    b.style.background = 'var(--sky)';
-    b.onclick = () => {
-      quizRunId++;
-      silence();
-      learn(0);
-    };
-
-    m.append(b);
-    app.append(m);
-    return;
+function quiz(mode){
+  const learned=CHARS.filter(c=>S.done[c]);
+  const pool=mode==='pic'?learned.filter(c=>P[c]):learned;
+  const base=mode==='pic'?PIC:CHARS;
+  if(!pool.length){
+    app.innerHTML='';
+    const m=h('div','card result',`<div class="e">📚</div><div class="q">还没有学过的字，先去学习吧！</div>`);
+    const b=h('button','btn','去学习');b.style.background='var(--sky)';b.onclick=()=>learn(0);m.append(b);app.append(m);return;
   }
-
-  const qs = shuffle(pool).slice(0, 15);
-  let n = 0;
-  let right = 0;
-
-  function next() {
-    // 防止旧题目的异步回调修改新页面
-    if (runId !== quizRunId) return;
-
-    silence();
-    app.innerHTML = '';
-
-    if (n >= qs.length) {
-      end();
-      return;
-    }
-
-    const c = qs[n];
-    const seen = new Set([c]);
-    const others = [];
-
-    for (const src of [pool, base, CHARS]) {
-      for (const x of shuffle(src)) {
-        if (others.length >= 2) break;
-        if (!seen.has(x)) {
-          seen.add(x);
-          others.push(x);
-        }
-      }
-      if (others.length >= 2) break;
-    }
-
-    const opts = shuffle([c, ...others]);
-
-    const bar = h('div', 'bar');
-    const bk = h('button', 'back', '← 退出');
-    bk.onclick = testMenu;
-    bar.append(bk);
-
-    const pr = h('div', 'prog',
-      `<b style="width:${n / qs.length * 100}%"></b>`);
-
-    app.append(bar, pr);
-
-    const card = h('div', 'card');
-    const feedback = h('div', 'q', '');
-
-    if (mode === 'pic') {
-      card.append(media(c));
-      card.append(h('div', 'q', '这是哪个字？'));
-    } else {
-      card.append(h('div', 'q', '听一听，是哪个字？'));
-
-      const listen = h('button', 'btn', '🔊 再听一遍');
-      listen.style.background = 'var(--sky)';
-      listen.onclick = () => say(c);
-      card.append(listen);
-
-      // 等当前题目渲染后再播放
-      requestAnimationFrame(() => {
-        if (runId === quizRunId && n < qs.length) say(c);
-      });
-    }
-
-    const o = h('div', 'opts');
-    let locked = false;
-
-    opts.forEach(x => {
-      const b = h('button', 'opt han', x);
-      b.type = 'button';
-
-      b.onclick = () => {
-        if (runId !== quizRunId || locked) return;
-
-        // 同一个错误选项不重复触发反馈
-        if (b.dataset.wrong === '1') return;
-
-        if (x !== c) {
-          b.dataset.wrong = '1';
-          b.classList.remove('no');
-          void b.offsetWidth;
-          b.classList.add('no');
-
-          feedback.textContent = '再试一次！';
-          beep(false);
-          speakText('不对哦，再试一次。', 0.75);
-
-          return;
-        }
-
-        // 正确答案：锁定本题，避免重复点击
-        locked = true;
-
-        o.querySelectorAll('button').forEach(btn => {
-          btn.disabled = true;
-          if (btn.dataset.answer === c) {
-            btn.classList.add('ok');
-          }
-        });
-
-        b.classList.add('ok');
-        feedback.textContent = '答对了！';
-
-        right++;
-        S.stars++;
-        S.done[c] = 1;
-        save();
-        beep(true);
-
-        let advanced = false;
-        let advanceTimer = null;
-
-        const advance = () => {
-          // 语音结束和备用计时器只能推进一次
-          if (advanced || runId !== quizRunId) return;
-
-          advanced = true;
-          if (advanceTimer !== null) {
-            clearTimeout(advanceTimer);
-          }
-
-          n++;
-          next();
-        };
-
-        const phrase = P[c]
-          ? `答对了！${c}。${P[c][1]}`
-          : `答对了！${c}`;
-
-        // 优先等语音播放完成
-        speakText(phrase, 0.72, advance);
-
-        // 语音服务失败或没有回调时，确保题目仍会前进
-        advanceTimer = setTimeout(advance, 7000);
-      };
-
-      b.dataset.answer = x;
-      o.append(b);
-    });
-
-    card.append(feedback, o);
-    app.append(card);
+  const qs=shuffle(pool).slice(0,15);let n=0,right=0;
+  function next(){
+    app.innerHTML='';
+    if(n>=qs.length)return end();
+    const c=qs[n];
+    const others=[...new Set([...shuffle(pool.filter(x=>x!==c)),...shuffle(base.filter(x=>x!==c))])].slice(0,2);
+    const opts=shuffle([c,...others]);
+    const bar=h('div','bar');const bk=h('button','back','← 退出');bk.onclick=testMenu;
+    const pr=h('div','prog',`<b style="width:${n/qs.length*100}%"></b>`);bar.append(bk);app.append(bar,pr);
+    const card=h('div','card');
+    if(mode==='pic'){card.append(media(c));card.append(h('div','q','这是哪个字？'))}
+    else{const b=h('button','btn','🔊 再听一遍');b.style.background='var(--sky)';b.onclick=()=>say(c);card.append(h('div','q','听一听，是哪个字？'),b);setTimeout(()=>say(c),900)}
+    const o=h('div','opts');
+    opts.forEach(x=>{const b=h('button','opt han',x);b.onclick=()=>{
+      if(card.dataset.lock)return;
+      if(x===c){card.dataset.lock=1;b.classList.add('ok');beep(true);right++;S.stars++;save();say(c);setTimeout(()=>{n++;next()},1900)}
+      else{b.classList.add('no');beep(false)}}
+      o.append(b)});
+    card.append(o);app.append(card);
   }
-
-  function end() {
-    if (runId !== quizRunId) return;
-
-    silence();
-
-    const e = right >= 9 ? '🏆' : right >= 6 ? '🥳' : '💪';
-
-    const r = h('div', 'card result',
-      `<div class="e">${e}</div>
-       <div class="q">答对 ${right} / ${qs.length}，得到 ${right} 颗星！</div>`);
-
-    const row = h('div', 'row');
-
-    const a = h('button', 'btn', '再玩一次');
-    a.style.background = 'var(--coral)';
-    a.onclick = () => quiz(mode);
-
-    const b = h('button', 'btn', '回首页');
-    b.style.background = 'var(--sky)';
-    b.onclick = () => {
-      quizRunId++;
-      silence();
-      home();
-    };
-
-    row.append(a, b);
-    r.append(row);
-    app.append(r);
-
-    beep(true);
-    speakText(`测试完成，答对 ${right} 题。`, 0.72);
-    setTimeout(() => {
-      if (runId === quizRunId) giveSticker();
-    }, 900);
+  function end(){
+    const e=right>=9?'🏆':right>=6?'🥳':'💪';
+    const r=h('div','card result',`<div class="e">${e}</div><div class="q">答对 ${right} / ${qs.length}，得到 ${right} 颗星！</div>`);
+    const row=h('div','row');
+    const a=h('button','btn','再玩一次');a.style.background='var(--coral)';a.onclick=()=>quiz(mode);
+    const b=h('button','btn','回首页');b.style.background='var(--sky)';b.onclick=home;
+    row.append(a,b);r.append(row);app.append(r);beep(true);setTimeout(giveSticker,900);
   }
-
   next();
 }
 
