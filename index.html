@@ -109,6 +109,57 @@ function loadTheme(){const d=ALL[S.theme]||blank();S.done=d.done||{};S.stars=d.s
 loadTheme();
 const save=()=>{ALL[S.theme]={done:S.done,stars:S.stars,rewarded:S.rewarded,lib:S.lib,coll:S.coll[S.theme]||[]};try{localStorage.setItem('hanzi',JSON.stringify({v:2,theme:S.theme,themeChosen:S.themeChosen,data:ALL}))}catch(e){}$('#stars').textContent='⭐ '+S.stars};
 save();
+/* ===== 进度导出 / 导入 ===== */
+function exportSave(){
+  const data=JSON.stringify({v:2,theme:S.theme,themeChosen:S.themeChosen,data:ALL});
+  const code=btoa(unescape(encodeURIComponent(data)));
+  const ov=h('div','ov'),bx=h('div','card poem');
+  const ta=h('textarea','');
+  ta.value=code;
+  ta.style.cssText='width:100%;height:140px;font-size:14px;border-radius:12px;border:2px solid var(--line);padding:10px;font-family:monospace;resize:vertical';
+  const tip=h('div','word','复制下面这段文字保存好，换设备时粘贴回来即可恢复');
+  const row=h('div','row');
+  const cp=h('button','btn','📋 复制');cp.style.background='var(--sky)';
+  cp.onclick=async()=>{
+    try{await navigator.clipboard.writeText(code);cp.textContent='✅ 已复制'}
+    catch(e){ta.select();document.execCommand('copy');cp.textContent='✅ 已复制'}
+  };
+  const cl=h('button','btn','关闭');cl.style.background='var(--coral)';cl.onclick=()=>ov.remove();
+  row.append(cp,cl);
+  bx.append(h('div','q','💾 保存进度'),tip,ta,row);
+  ov.append(bx);document.body.append(ov);
+}
+function importSave(){
+  const ov=h('div','ov'),bx=h('div','card poem');
+  const ta=h('textarea','');
+  ta.placeholder='把之前保存的文字粘贴到这里';
+  ta.style.cssText='width:100%;height:140px;font-size:14px;border-radius:12px;border:2px solid var(--line);padding:10px;font-family:monospace;resize:vertical';
+  const msg=h('div','word','');
+  const row=h('div','row');
+  const ok=h('button','btn','恢复');ok.style.background='var(--leaf)';
+  ok.onclick=()=>{
+    try{
+      const raw=decodeURIComponent(escape(atob(ta.value.trim())));
+      const obj=JSON.parse(raw);
+      if(!obj||obj.v!==2||!obj.data)throw new Error('格式不对');
+      ALL=obj.data;
+      S.theme=obj.theme||'train';
+      S.themeChosen=!!obj.themeChosen;
+      loadTheme();
+      save();
+      applyTheme();
+      ov.remove();
+      home();
+      alert('进度已恢复！');
+    }catch(e){
+      msg.textContent='❌ 这段文字无法识别，请检查是否复制完整';
+    }
+  };
+  const cl=h('button','btn','取消');cl.style.background='var(--coral)';cl.onclick=()=>ov.remove();
+  row.append(ok,cl);
+  bx.append(h('div','q','📥 恢复进度'),ta,msg,row);
+  ov.append(bx);document.body.append(ov);
+}
 const shuffle=a=>[...a].sort(()=>Math.random()-.5);
 const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.innerHTML=x;return e};
 
@@ -161,7 +212,13 @@ function home(){
   const b=h('button','big','<span class="e">🎯</span>测试<small>听声音 · 看图片 · 找汉字</small>');b.style.background='linear-gradient(135deg,#FFC4D4,#FFD9A8)';b.onclick=testMenu;
   const T=curTheme(),tr=h('button','big',`<span class="e">${T.i}</span>${T.coll}<small>已收集 ${(S.coll[T.id]||[]).length} 个 · 每 24 颗星得 1 个</small>`);tr.style.background=`linear-gradient(135deg,${T.t[0]},${T.t[1]})`;tr.onclick=museum;
   const lb=h('button','big',`<span class="e">🎞️</span>视频库<small>已解锁 ${S.lib.length} 个古诗和故事</small>`);lb.style.background='linear-gradient(135deg,#FFC4D4,#E8D5FF)';lb.onclick=library;
-  g.append(a,b,tr,lb);app.append(g);
+  g.append(a,b,tr,lb);
+  const sv=h('button','big','<span class="e">💾</span>保存进度<small>把进度存成一段文字，换设备也能恢复</small>');
+  sv.style.background='linear-gradient(135deg,#CFEFC4,#A8E6CF)';sv.onclick=exportSave;
+  const rs=h('button','big','<span class="e">📥</span>恢复进度<small>粘贴之前保存的文字</small>');
+  rs.style.background='linear-gradient(135deg,#FFE29A,#FFD9A8)';rs.onclick=importSave;
+  g.append(sv,rs);
+  app.append(g);
   const n=Object.keys(S.done).length;
   app.append(h('p','q',`已经认识 <b>${n}</b> / ${CHARS.length} 个字`));
   const doneLevels=LV.filter(l=>l.every(c=>S.done[c])).length;
