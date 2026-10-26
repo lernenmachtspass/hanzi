@@ -30,6 +30,8 @@ button:hover{filter:brightness(1.04)}button:active{transform:scale(.96)}
 .tabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px}
 .tab{background:var(--card);border-radius:99px;padding:8px 16px;font-size:18px;white-space:nowrap;box-shadow:var(--shadow);color:var(--soft)}
 .tab[aria-pressed=true]{background:var(--plum);color:#3D3260}
+.tab.done{background:#D5F6E8;color:#0B5A44;border:2px solid #7ED7B6}
+.tab.done[aria-pressed=true]{background:var(--plum);color:#3D3260;border-color:#8E6CF0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:12px}
 .cell{background:var(--card);border-radius:24px;aspect-ratio:1;font-size:46px;position:relative;box-shadow:var(--shadow);color:var(--ink)}
 .cell:hover{transform:translateY(-3px)}
@@ -62,8 +64,7 @@ img.em{height:1em;width:1em;vertical-align:-.14em;display:inline-block;pointer-e
 .sc{font-size:110px;line-height:1.1;animation:pop .6s}
 .ln{font-size:min(9vw,44px)}
 .story-line{line-height:1.8;max-width:100%;overflow-wrap:anywhere}
-.story-known{color:#3478C8;font-weight:700}
-.story-new{display:inline-block;color:#E44878;font-size:1.42em;font-weight:900;line-height:1.2;text-shadow:0 2px 0 #FFE0EA;margin:0 1px;transform:translateY(1px)}
+.story-new{display:inline-block;color:#E44878;font-size:1.42em;font-weight:900;line-height:1.2;text-shadow:0 2px 0 #FFE0EA;margin:0 1px;transform:translateY(1px);background:#FFE4EC;border:2px solid #FFB3C6;border-radius:6px;padding:0 4px}
 .cab{background:linear-gradient(160deg,#fff,#F7EFE8);border:8px solid #D4A574;border-radius:24px;padding:10px;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;box-shadow:var(--shadow),inset 0 0 0 3px #F0D9BD}
 .shelf{display:grid;place-items:center;gap:2px;padding:10px 6px 4px;border-bottom:10px solid #D4A574;background:linear-gradient(160deg,rgba(169,212,255,.25),rgba(255,255,255,.1));border-radius:10px 10px 0 0;min-height:132px;color:#3D3260;text-align:center;font-size:16px}
 .shelf svg{width:100%;max-width:150px;height:auto}
@@ -109,6 +110,9 @@ function loadTheme(){const d=ALL[S.theme]||blank();S.done=d.done||{};S.stars=d.s
 loadTheme();
 const save=()=>{ALL[S.theme]={done:S.done,stars:S.stars,rewarded:S.rewarded,lib:S.lib,coll:S.coll[S.theme]||[]};try{localStorage.setItem('hanzi',JSON.stringify({v:2,theme:S.theme,themeChosen:S.themeChosen,data:ALL}))}catch(e){}$('#stars').textContent='⭐ '+S.stars};
 save();
+const shuffle=a=>[...a].sort(()=>Math.random()-.5);
+const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.innerHTML=x;return e};
+
 /* ===== 进度导出 / 导入 ===== */
 function exportSave(){
   const data=JSON.stringify({v:2,theme:S.theme,themeChosen:S.themeChosen,data:ALL});
@@ -160,8 +164,6 @@ function importSave(){
   bx.append(h('div','q','📥 恢复进度'),ta,msg,row);
   ov.append(bx);document.body.append(ov);
 }
-const shuffle=a=>[...a].sort(()=>Math.random()-.5);
-const h=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.innerHTML=x;return e};
 
 /* ===== 声音 ===== */
 let CUR,M={};
@@ -230,10 +232,11 @@ function learn(lv){
   app.innerHTML='';
   const bar=h('div','bar');const bk=h('button','back','← 首页');bk.onclick=home;
   const tabs=h('div','tabs');LV.forEach((_,i)=>{
-  const full=LV[i].every(c=>S.done[c]);
-  const t=h('button','tab'+(full?' done':''),`第${i+1}关${full?' ✓':''}`);
-  t.setAttribute('aria-pressed',i===lv);t.onclick=()=>learn(i);tabs.append(t);
-});
+    const full=LV[i].every(c=>S.done[c]);
+    const t=h('button','tab'+(full?' done':''),`第${i+1}关${full?' ✓':''}`);
+    t.setAttribute('aria-pressed',i===lv);t.onclick=()=>learn(i);tabs.append(t);
+  });
+  bar.append(bk,tabs);app.append(bar);
   const gr=h('div','grid');
   LV[lv].forEach((c,i)=>{const b=h('button','cell han'+(S.done[c]?' done':''),c+(P[c]?`<i>${P[c][0]}</i>`:''));b.onclick=()=>showCard(lv,i);gr.append(b)});
   app.append(gr);
@@ -257,7 +260,6 @@ function showCard(lv,i){
   if(i>0)mk('⬅️','var(--leaf)',()=>card_(lv,i-1));
   mk(i<list.length-1?'下一个 ➡️':'🎉 完成本关','var(--coral)',()=>{
     if(i<list.length-1)return card_(lv,i+1);
-    // 完成整关：解锁古诗（每关1首）；若本关是第3/6/9…关，额外解锁故事
     beep(true);unlockAndPlay(lv);
   });
   card.append(r);app.append(card);
@@ -276,14 +278,15 @@ function unlockAndPlay(level){
   const T=curTheme();
   const pi=lessonPoem(T.id,level);
   addLib('p:'+pi);
-  const isStoryLevel=(level+1)%3===0; // 第3、6、9…关
+  const isStoryLevel=(level+1)%3===0;
   let si=null;
   if(isStoryLevel){si=Math.min(Math.floor(level/3),29);addLib(`s:${T.id}:${si}`);}
-  const after=()=>{
-    if(si!=null)storyTheater(T.id,si,()=>learn(level));
-    else learn(level);
-  };
-  poemTheater(pi,si!=null?{label:`${T.n}小故事`,fn:()=>storyTheater(T.id,si,()=>learn(level))}:{label:'回学习',fn:()=>learn(level)});
+  const back={label:'回学习',fn:()=>learn(level)};
+  if(si!=null){
+    poemTheater(pi,{label:`${T.n}小故事`,fn:()=>storyTheater(T.id,si,back)});
+  }else{
+    poemTheater(pi,back);
+  }
 }
 
 /* ===== 测试 ===== */
@@ -387,7 +390,6 @@ const POEMS=[
 {t:'江南',a:'汉乐府',l:['江南可采莲，','莲叶何田田。','鱼戏莲叶间，','鱼戏莲叶东。'],e:['🪷','🍃','🐟','🌊']},
 {t:'风',a:'李峤',l:['解落三秋叶，','能开二月花。','过江千尺浪，','入竹万竿斜。'],e:['🍂','🌸','🌊','🎋']},
 {t:'鹿柴',a:'王维',l:['空山不见人，','但闻人语响。','返景入深林，','复照青苔上。'],e:['🌳','👂','🌅','🌿']},
-  
 {t:"悯农其一",a:"李绅",l:["春种一粒粟，","秋收万颗子。","四海无闲田，","农夫犹饿死。"],e:['🌾','👨‍🌾','☀️','😢']},
 {t:"回乡偶书其二",a:"贺知章",l:["离别家乡岁月多，","近来人事半消磨。","惟有门前镜湖水，","春风不改旧时波。"],e:['🏠','🍂','🌙','💧']},
 {t:"凉州词",a:"王之涣",l:["黄河远上白云间，","一片孤城万仞山。","羌笛何须怨杨柳，","春风不度玉门关。"],e:['🏜️','🏯','🐎','🌙']},
@@ -461,7 +463,7 @@ const THEMES=[
 {id:'animals',n:'小动物',i:'🐰',coll:'动物朋友墙',t:['#FFD9B8','#CFEFC4'],
  stk:[['🐰','小兔子'],['🐻','小熊'],['🐱','小猫'],['🐶','小狗'],['🐤','小鸡'],['🦊','狐狸'],['🐼','熊猫'],['🐨','考拉'],['🦁','狮子'],['🐘','大象'],['🐸','青蛙'],['🐧','企鹅']]}];
 
-/* STORY_BOOK：每主题先 6 篇（覆盖第1~18关），后续按批补到 30 篇 */
+/* STORY_BOOK：每主题 6 篇（覆盖第1~18关），后续按批补到 30 篇 */
 const STORY_BOOK={
 princess:[
  ['魔法书的第一页','公主翻开魔法书，第一页写着三个字。','她一个一个读出来，书页亮起柔和的光。','小精灵从书里飞出来，向她问好。','公主笑着合上书，约好明天再读。'],
@@ -529,7 +531,6 @@ animals:[
 ]
 };
 
-/* 每 3 关共用 1 篇故事；不足时回落最后一篇 */
 function storyFor(themeId,level){
   const arr=STORY_BOOK[themeId]||STORY_BOOK.animals;
   const idx=Math.min(Math.floor(level/3),arr.length-1);
@@ -558,14 +559,23 @@ function pickTheme(first){
   ov.append(bx);document.body.append(ov);
 }
 function escapeStoryText(text){return String(text).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function storyTextHTML(text){
-  const learned=new Set(Object.keys(S.done||{}));
+
+/* 只高亮本故事对应三关的字；storyLevel 缺省则全部普通显示 */
+function storyTextHTML(text,storyLevel){
+  const cur=new Set();
+  if(storyLevel!=null){
+    for(let k=0;k<3;k++){
+      const arr=LV[storyLevel+k];
+      if(arr)arr.forEach(c=>cur.add(c));
+    }
+  }
   return Array.from(String(text)).map(ch=>{
     const safe=escapeStoryText(ch);
-    if(learned.has(ch))return `<span class="story-known">${safe}</span>`;
+    if(cur.has(ch))return `<span class="story-new">${safe}</span>`;
     return safe;
   }).join('');
 }
+
 function theater(o){
   let timers=[],runId=0;
   const ov=h('div','ov'),bx=h('div','card poem'),st=h('div','stage');
@@ -577,7 +587,7 @@ function theater(o){
     const valid=()=>myRun===runId&&ov.isConnected;
     const showScene=(sc)=>{
       if(!valid())return;
-      const line=o.highlight?storyTextHTML(sc[1]):escapeStoryText(sc[1]);
+      const line=o.highlight?storyTextHTML(sc[1],o.storyLevel):escapeStoryText(sc[1]);
       st.innerHTML=`<div class="sc">${sc[0]}</div><div class="han ln story-line">${line}</div>`;
       speakText(sc[1],o.rate,()=>{if(valid())wait(350,()=>nextScene())});
     };
