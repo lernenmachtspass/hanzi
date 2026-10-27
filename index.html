@@ -1183,12 +1183,43 @@ function trainSVG(t){
   const [c1,c2,c3]=PAL[t.p],ink='#5B4B7A',L=`stroke="${ink}" stroke-width="2" stroke-linejoin="round"`;
   const chim=[`<rect x="30" y="10" width="11" height="18" rx="3" fill="${c3}" ${L}/><rect x="27" y="6" width="17" height="6" rx="3" fill="${c3}" ${L}/>`,
    `<polygon points="28,28 43,28 40,10 31,10" fill="${c3}" ${L}/><ellipse cx="35.5" cy="9" rx="9" ry="4" fill="${c3}" ${L}/>`,
-   `<rect x="32" y="12" width="9" height="16" rx="4" fill="${c3}" ${L}/><circle cx="36.5" cy="10" r="7" fill="${c2}" ${L}/>`][t.ch];
+   `<rect x="32" y="12" width="9" height="16" rx="4" fill="${c3}" ${L}/><circle cx="36.5" cy="10" r="7" fill="${c2}" ${L}/>` , `<rect x="30" y="10" width="11" height="18"
+    rx="3" fill="${c3}" ${L}/> , `<rect x="27" y="6" width="17" height="6" rx="3" fill="${c3}" ${L}/>`][t.ch];
+  const bodies = [
+  // 1. 经典圆角车身
+  `<rect x="20" y="26" width="64" height="28"
+    rx="14" fill="${c1}" ${L}/>`,
+
+  // 2. 流线型车身
+  `<path d="M20 40 Q20 26 35 26 H72
+    Q84 26 84 40 Q84 54 72 54 H35
+    Q20 54 20 40Z" fill="${c1}" ${L}/>`,
+
+  // 3. 蒸汽火车风格
+  `<path d="M20 32 Q20 26 28 26 H76
+    L84 36 V48 L76 54 H28 Q20 54 20 48Z"
+    fill="${c1}" ${L}/>`,
+
+  // 4. 小火箭风格
+  `<path d="M20 30 Q35 20 65 27
+    L84 40 L65 53 Q35 60 20 50Z"
+    fill="${c1}" ${L}/>`,
+
+  // 5. 双层圆顶车身
+  `<path d="M20 54 V40 Q20 26 34 26
+    H70 Q84 26 84 40 V54Z"
+    fill="${c1}" ${L}/>`
+];
   const deco=[`<polygon points="103,43 105,47.5 110,48 106.5,51 107.5,56 103,53.5 98.5,56 99.5,51 96,48 101,47.5" fill="#FFD166" ${L}/>`,
    `<path d="M103 56 C94 49 97 42 103 47 C109 42 112 49 103 56Z" fill="#FF8FAE" ${L}/>`,
    `<circle cx="96" cy="50" r="3.5" fill="#fff" ${L}/><circle cx="103" cy="50" r="3.5" fill="#FFD166" ${L}/><circle cx="110" cy="50" r="3.5" fill="#FF8FAE" ${L}/>`][t.d];
   const mouth=t.f?`<path d="M50 46 Q55 56 60 46Z" fill="#FF8FAE" stroke="#3D3260" stroke-width="1.5" stroke-linejoin="round"/>`:`<path d="M50 47 Q55 52 60 47" stroke="#3D3260" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-  const wheel=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c3}" ${L}/><circle cx="${x}" cy="${y}" r="${r/3}" fill="#fff"/>`;
+  const wheel = (x, y, r) => `
+  <circle cx="${x}" cy="${y}" r="${r}"
+    fill="${c3}" ${L}/>
+  <circle cx="${x}" cy="${y}" r="${Math.max(1.5, r * 0.34)}"
+    fill="#fff"/>
+`;
   return `<svg viewBox="0 -12 130 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${t.n}">
 <circle cx="40" cy="-3" r="5" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="49" cy="-8" r="4" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="57" cy="-4" r="3" fill="#fff" stroke="#E2D8F3" stroke-width="2"/>
 ${chim}
