@@ -1178,63 +1178,117 @@ function library(){
 /* 贴纸 */
 const PAL=[['#FFB3C6','#FFD9A8','#9A7BF0'],['#A9D4FF','#FFE29A','#FF8FAE'],['#A8E6CF','#CDB4F6','#FF9F7A'],['#FFE29A','#A9D4FF','#7ED7B6'],['#CDB4F6','#FFB3C6','#6FB1FF'],['#FFD9A8','#A8E6CF','#FF8FAE']];
 const TNAMES=['噗噗号','彩虹号','星星号','云朵号','棉花糖号','月亮号','小烟囱号','泡泡号','糖果号','小蜗牛号','哐当号','呼噜号','闪闪号','小煤球号','白云号','风车号','小铃铛号','橘子号','蓝莓号','小蘑菇号','嘟嘟号','咔嚓号','叮当号','向日葵号','小雪花号','萤火虫号','小皮球号','小树苗号','贝壳号','小鲸鱼号','风铃号','小铃鼓号','草莓号','柠檬号','小海豚号','小火箭号','小风筝号','小铃兰号','小雨滴号','小火车头'];
-function newTrain(){const r=n=>Math.floor(Math.random()*n);return{p:r(PAL.length),ch:r(3),d:r(3),f:r(2),n:TNAMES[r(TNAMES.length)]}}
-function trainSVG(t){
-  const [c1,c2,c3]=PAL[t.p],ink='#5B4B7A',L=`stroke="${ink}" stroke-width="2" stroke-linejoin="round"`;
-  const chim=[`<rect x="30" y="10" width="11" height="18" rx="3" fill="${c3}" ${L}/><rect x="27" y="6" width="17" height="6" rx="3" fill="${c3}" ${L}/>`,
-   `<polygon points="28,28 43,28 40,10 31,10" fill="${c3}" ${L}/><ellipse cx="35.5" cy="9" rx="9" ry="4" fill="${c3}" ${L}/>`,
-   `<rect x="32" y="12" width="9" height="16" rx="4" fill="${c3}" ${L}/><circle cx="36.5" cy="10" r="7" fill="${c2}" ${L}/>` , `<rect x="30" y="10" width="11" height="18"
-    rx="3" fill="${c3}" ${L}/> , `<rect x="27" y="6" width="17" height="6" rx="3" fill="${c3}" ${L}/>`][t.ch];
-  const bodies = [
-  // 1. 经典圆角车身
-  `<rect x="20" y="26" width="64" height="28"
-    rx="14" fill="${c1}" ${L}/>`,
 
-  // 2. 流线型车身
-  `<path d="M20 40 Q20 26 35 26 H72
-    Q84 26 84 40 Q84 54 72 54 H35
-    Q20 54 20 40Z" fill="${c1}" ${L}/>`,
+function newTrain() {
+  const r = n => Math.floor(Math.random() * n);
 
-  // 3. 蒸汽火车风格
-  `<path d="M20 32 Q20 26 28 26 H76
-    L84 36 V48 L76 54 H28 Q20 54 20 48Z"
-    fill="${c1}" ${L}/>`,
-
-  // 4. 小火箭风格
-  `<path d="M20 30 Q35 20 65 27
-    L84 40 L65 53 Q35 60 20 50Z"
-    fill="${c1}" ${L}/>`,
-
-  // 5. 双层圆顶车身
-  `<path d="M20 54 V40 Q20 26 34 26
-    H70 Q84 26 84 40 V54Z"
-    fill="${c1}" ${L}/>`
-];
-  const deco=[`<polygon points="103,43 105,47.5 110,48 106.5,51 107.5,56 103,53.5 98.5,56 99.5,51 96,48 101,47.5" fill="#FFD166" ${L}/>`,
-   `<path d="M103 56 C94 49 97 42 103 47 C109 42 112 49 103 56Z" fill="#FF8FAE" ${L}/>`,
-   `<circle cx="96" cy="50" r="3.5" fill="#fff" ${L}/><circle cx="103" cy="50" r="3.5" fill="#FFD166" ${L}/><circle cx="110" cy="50" r="3.5" fill="#FF8FAE" ${L}/>`][t.d];
-  const mouth=t.f?`<path d="M50 46 Q55 56 60 46Z" fill="#FF8FAE" stroke="#3D3260" stroke-width="1.5" stroke-linejoin="round"/>`:`<path d="M50 47 Q55 52 60 47" stroke="#3D3260" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-  const wheel = (x, y, r) => `
-  <circle cx="${x}" cy="${y}" r="${r}"
-    fill="${c3}" ${L}/>
-  <circle cx="${x}" cy="${y}" r="${Math.max(1.5, r * 0.34)}"
-    fill="#fff"/>
-`;
-  return `<svg viewBox="0 -12 130 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${t.n}">
-<circle cx="40" cy="-3" r="5" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="49" cy="-8" r="4" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="57" cy="-4" r="3" fill="#fff" stroke="#E2D8F3" stroke-width="2"/>
-${chim}
-<rect x="20" y="26" width="64" height="28" rx="14" fill="${c1}" ${L}/>
-<circle cx="66" cy="24" r="6" fill="${c2}" ${L}/>
-<rect x="82" y="16" width="32" height="42" rx="6" fill="${c2}" ${L}/><rect x="78" y="10" width="40" height="9" rx="4" fill="${c3}" ${L}/>
-<rect x="89" y="24" width="18" height="14" rx="4" fill="#fff" ${L}/>
-${deco}
-<circle cx="45" cy="40" r="3.2" fill="#3D3260"/><circle cx="65" cy="40" r="3.2" fill="#3D3260"/><circle cx="46" cy="39" r="1" fill="#fff"/><circle cx="66" cy="39" r="1" fill="#fff"/>
-<circle cx="38" cy="46" r="3.5" fill="#FF9FB5" opacity=".6"/><circle cx="72" cy="46" r="3.5" fill="#FF9FB5" opacity=".6"/>${mouth}
-<rect x="14" y="54" width="106" height="8" rx="4" fill="${ink}"/>
-<polygon points="4,70 16,54 16,70" fill="${c3}" ${L}/>
-${wheel(104,68,12)}${wheel(50,72,8)}${wheel(70,72,8)}
-<rect x="0" y="82" width="130" height="3" rx="1.5" fill="#C9B8E6"/></svg>`;
+  return {
+    p: r(PAL.length), // 保留原来的 PAL 配色系统
+    ch: r(5),          // 5 种烟囱
+    body: r(5),        // 5 种车身形状
+    d: r(5),           // 5 种装饰
+    f: r(5),           // 5 种嘴巴表情
+    wh: r(5),          // 5 种车轮尺寸组合
+    sm: r(5),          // 5 种烟雾效果
+    n: TNAMES[r(TNAMES.length)]
+  };
 }
+
+function trainSVG(t) {
+  const [c1, c2, c3] = PAL[t.p];
+  const ink = '#5B4B7A';
+  const L = `stroke="${ink}" stroke-width="2" stroke-linejoin="round"`;
+  const pick = (v, n) => Number.isInteger(v) && v >= 0 && v < n
+    ? v
+    : Math.floor(Math.random() * n);
+
+  const ch = pick(t.ch, 5);
+  const body = pick(t.body, 5);
+  const d = pick(t.d, 5);
+  const face = pick(t.f, 5);
+  const wh = pick(t.wh, 5);
+  const sm = pick(t.sm, 5);
+
+  const chim = [
+    `<rect x="30" y="10" width="11" height="18" rx="3" fill="${c3}" ${L}/><rect x="27" y="6" width="17" height="6" rx="3" fill="${c3}" ${L}/>`,
+    `<polygon points="28,28 43,28 40,10 31,10" fill="${c3}" ${L}/><ellipse cx="35.5" cy="9" rx="9" ry="4" fill="${c3}" ${L}/>`,
+    `<rect x="32" y="12" width="9" height="16" rx="4" fill="${c3}" ${L}/><circle cx="36.5" cy="10" r="7" fill="${c2}" ${L}/>`,
+    `<path d="M29 28 V17 Q29 11 35 11 H39 Q45 11 45 17 V28Z" fill="${c3}" ${L}/><rect x="26" y="7" width="22" height="6" rx="2" fill="${c2}" ${L}/>`,
+    `<path d="M30 28 V15 L35 8 L41 15 V28Z" fill="${c3}" ${L}/><ellipse cx="35.5" cy="9" rx="8" ry="3" fill="${c2}" ${L}/>`
+  ][ch];
+
+  const bodies = [
+    `<rect x="20" y="26" width="64" height="28" rx="14" fill="${c1}" ${L}/>`,
+    `<path d="M20 40 Q20 26 35 26 H72 Q84 26 84 40 Q84 54 72 54 H35 Q20 54 20 40Z" fill="${c1}" ${L}/>`,
+    `<path d="M20 32 Q20 26 28 26 H76 L84 36 V48 L76 54 H28 Q20 54 20 48Z" fill="${c1}" ${L}/>`,
+    `<path d="M20 30 Q35 20 65 27 L84 40 L65 53 Q35 60 20 50Z" fill="${c1}" ${L}/>`,
+    `<path d="M20 54 V40 Q20 26 34 26 H70 Q84 26 84 40 V54Z" fill="${c1}" ${L}/>`
+  ][body];
+
+  const deco = [
+    `<polygon points="103,43 105,47.5 110,48 106.5,51 107.5,56 103,53.5 98.5,56 99.5,51 96,48 101,47.5" fill="#FFD166" ${L}/>`,
+    `<path d="M103 56 C94 49 97 42 103 47 C109 42 112 49 103 56Z" fill="#FF8FAE" ${L}/>`,
+    `<circle cx="96" cy="50" r="3.5" fill="#fff" ${L}/><circle cx="103" cy="50" r="3.5" fill="#FFD166" ${L}/><circle cx="110" cy="50" r="3.5" fill="#FF8FAE" ${L}/>`,
+    `<path d="M103 43 C95 39 94 48 101 50 L103 56 L105 50 C112 48 111 39 103 43Z" fill="#FF8FAE" ${L}/>`,
+    `<circle cx="103" cy="49" r="7" fill="#FFD166" ${L}/><circle cx="103" cy="40" r="3" fill="#FF8FAE" ${L}/><circle cx="112" cy="49" r="3" fill="#FF8FAE" ${L}/><circle cx="103" cy="58" r="3" fill="#FF8FAE" ${L}/><circle cx="94" cy="49" r="3" fill="#FF8FAE" ${L}/>`
+  ][d];
+
+  const mouths = [
+    `<path d="M50 47 Q55 52 60 47" stroke="#3D3260" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+    `<path d="M50 46 Q55 56 60 46Z" fill="#FF8FAE" stroke="#3D3260" stroke-width="1.5"/>`,
+    `<ellipse cx="55" cy="49" rx="3" ry="4" fill="#FF8FAE" stroke="#3D3260" stroke-width="1.5"/>`,
+    `<path d="M50 49 Q55 44 60 49" stroke="#3D3260" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+    `<path d="M50 46 Q55 54 60 46" stroke="#3D3260" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="55" cy="51" r="1.5" fill="#FF8FAE"/>`
+  ][face];
+
+  const smoke = [
+    `<circle cx="40" cy="-3" r="5" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="49" cy="-8" r="4" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="57" cy="-4" r="3" fill="#fff" stroke="#E2D8F3" stroke-width="2"/>`,
+    `<circle cx="39" cy="-2" r="4" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="47" cy="-9" r="5" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="56" cy="-11" r="4" fill="#fff" stroke="#E2D8F3" stroke-width="2"/>`,
+    `<path d="M37 1 Q31 -5 39 -8 Q44 -14 49 -7 Q56 -12 60 -4" fill="none" stroke="#E2D8F3" stroke-width="4" stroke-linecap="round"/>`,
+    `<circle cx="38" cy="-4" r="3" fill="#FFD166"/><circle cx="46" cy="-10" r="4" fill="#fff" stroke="#E2D8F3" stroke-width="2"/><circle cx="55" cy="-5" r="5" fill="#fff" stroke="#E2D8F3" stroke-width="2"/>`,
+    `<path d="M37 0 Q31 -5 38 -10 Q44 -15 48 -8 Q55 -14 61 -5" fill="none" stroke="#FF8FAE" stroke-width="4" stroke-linecap="round"/>`
+  ][sm];
+
+  const wheelSizes = [
+    [10, 7],
+    [12, 8],
+    [14, 9],
+    [9, 6],
+    [13, 6]
+  ][wh];
+
+  const wheel = (x, y, r) =>
+    `<circle cx="${x}" cy="${y}" r="${r}" fill="${c3}" ${L}/><circle cx="${x}" cy="${y}" r="${Math.max(2, r / 3)}" fill="#fff"/>`;
+
+  const eyes = `
+    <circle cx="45" cy="40" r="3.2" fill="#3D3260"/>
+    <circle cx="65" cy="40" r="3.2" fill="#3D3260"/>
+    <circle cx="46" cy="39" r="1" fill="#fff"/>
+    <circle cx="66" cy="39" r="1" fill="#fff"/>
+    <circle cx="38" cy="46" r="3.5" fill="#FF9FB5" opacity=".6"/>
+    <circle cx="72" cy="46" r="3.5" fill="#FF9FB5" opacity=".6"/>
+  `;
+
+  return `<svg viewBox="0 -16 130 106" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${t.n || '小火车'}">
+    ${smoke}
+    ${chim}
+    ${bodies}
+    <circle cx="66" cy="24" r="6" fill="${c2}" ${L}/>
+    <rect x="82" y="16" width="32" height="42" rx="6" fill="${c2}" ${L}/>
+    <rect x="78" y="10" width="40" height="9" rx="4" fill="${c3}" ${L}/>
+    <rect x="89" y="24" width="18" height="14" rx="4" fill="#fff" ${L}/>
+    ${deco}
+    ${eyes}
+    ${mouths}
+    <rect x="14" y="54" width="106" height="8" rx="4" fill="${ink}"/>
+    <polygon points="4,70 16,54 16,70" fill="${c3}" ${L}/>
+    ${wheel(104, 68, wheelSizes[0])}
+    ${wheel(50, 72, wheelSizes[1])}
+    ${wheel(70, 72, wheelSizes[1])}
+    <rect x="0" y="82" width="130" height="3" rx="1.5" fill="#C9B8E6"/>
+  </svg>`;
+}
+
 const artOf=it=>it.tr?trainSVG(it.tr):`<div class="stk" style="transform:rotate(${it.r||0}deg)">${it.e}</div>`;
 const totalColl=()=>Object.values(S.coll).reduce((a,b)=>a+b.length,0);
 function giveSticker(){
