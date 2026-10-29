@@ -388,6 +388,8 @@ function home(){
 
 /* ===== 学习 ===== */
 function learn(lv){
+  const oldTabs=app.querySelector('.tabs');
+  const prevScroll=oldTabs?oldTabs.scrollLeft:null;// 记住旧位置
   app.innerHTML='';
   const bar=h('div','bar');const bk=h('button','back','← 首页');bk.onclick=home;
   const tabs=h('div','tabs');LV.forEach((_,i)=>{
@@ -396,6 +398,9 @@ function learn(lv){
     t.setAttribute('aria-pressed',i===lv);t.onclick=()=>learn(i);tabs.append(t);
   });
   bar.append(bk,tabs);app.append(bar);
+  if(prevScroll!==null){
+    tabs.scrollLeft=prevScroll;// 保持原位置
+  }
   const gr=h('div','grid');
   LV[lv].forEach((c,i)=>{const b=h('button','cell han'+(S.done[c]?' done':''),c+(P[c]?`<i>${P[c][0]}</i>`:''));b.onclick=()=>showCard(lv,i);gr.append(b)});
   app.append(gr);
