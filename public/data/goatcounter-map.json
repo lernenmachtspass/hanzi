@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-11-05T14:15:42.825364+00:00",
+  "generated_at": "2026-11-06T10:54:10.176124+00:00",
   "site": "hanzi",
   "metric": "pageviews",
   "total_pageviews": 2,
@@ -12,5 +12,5 @@
   ],
   "unmapped_location_names": [],
   "period_start": "2000-01-01T00:00:00Z",
-  "period_end": "2026-11-05T14:00:00+00:00"
+  "period_end": "2026-11-06T10:00:00+00:00"
 }
